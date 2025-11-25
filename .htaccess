@@ -1,0 +1,14 @@
+# Redirect 404 errors to under-construction page for zone files
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Check if the requested file doesn't exist
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # If it's a zone HTML file, redirect to under-construction
+    RewriteRule ^Fashion/HTML/.*\.html$ Fashion/HTML/under-construction.html [L]
+</IfModule>
+
+# Alternative: ErrorDocument approach
+ErrorDocument 404 /Project-99-Maps/Fashion/HTML/under-construction.html
