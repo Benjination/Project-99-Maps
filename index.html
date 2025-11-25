@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 1999 Maps</title>
+    <link rel="stylesheet" href="Function/CSS/maps.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">EverQuest Classic Zone Maps</p>
+        </header>
+
+        <nav class="zones-nav">
+            <div class="zone-item">
+                <button class="zone-button" data-zone="antonica">ANTONICA</button>
+            </div>
+            <div class="zone-item">
+                <button class="zone-button" data-zone="odus">ODUS</button>
+                <div id="odus-submenu" class="submenu hidden">
+                    <div class="submenu-section">
+                        <h3>Cities</h3>
+                        <ul>
+                            <li><a href="#">Erudin</a></li>
+                            <li><a href="Fashion/HTML/paineel.html" class="active-location">Paineel</a></li>
+                        </ul>
+                    </div>
+                    <div class="submenu-section">
+                        <h3>Outdoors / Dungeons</h3>
+                        <ul>
+                            <li><a href="#">Erud's Crossing</a></li>
+                            <li><a href="#">Kerra Island</a></li>
+                            <li><a href="Fashion/HTML/toxulia-forest.html">Toxulia Forest</a></li>
+                            <li><a href="Fashion/HTML/the-hole.html">The Hole</a></li>
+                            <li><a href="#">Stonebrunt Mountains</a></li>
+                            <li><a href="Fashion/HTML/the-warrens.html">The Warrens</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="zone-item">
+                <button class="zone-button" data-zone="faydwer">FAYDWER</button>
+            </div>
+            <div class="zone-item">
+                <button class="zone-button" data-zone="kunark">KUNARK</button>
+            </div>
+            <div class="zone-item">
+                <button class="zone-button" data-zone="velious">VELIOUS</button>
+            </div>
+            <div class="zone-item">
+                <button class="zone-button" data-zone="planes">PLANES</button>
+            </div>
+        </nav>
+
+        <main id="content">
+            <section class="welcome">
+                <h2>Welcome to Project 1999 Maps</h2>
+                <p>Select a zone above to explore detailed maps of EverQuest Classic locations.</p>
+            </section>
+        </main>
+    </div>
+
+    <script src="Function/maps.js"></script>
+</body>
+</html>
