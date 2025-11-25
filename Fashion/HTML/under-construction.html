@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Construction - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <style>
+        .construction-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .construction-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .construction-container h2 {
+            font-size: 2.5em;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .construction-container p {
+            font-size: 1.2em;
+            color: #aaa;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        .construction-message {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 4px;
+            padding: 30px;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        .construction-message h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .construction-message p {
+            color: #e0e0e0;
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #333 0%, #444 100%);
+            color: #ffd700;
+            text-decoration: none;
+            border: 2px solid #ffd700;
+            border-radius: 4px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #444 0%, #555 100%);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">EverQuest Classic Zone Maps</p>
+        </header>
+
+        <div class="construction-container">
+            <div class="construction-icon">🏗️</div>
+            <h2>Under Construction</h2>
+            <p>This zone is still being mapped!</p>
+            
+            <div class="construction-message">
+                <h3>Coming Soon</h3>
+                <p>We're hard at work creating detailed maps and location markers for this zone. Check back soon!</p>
+            </div>
+
+            <a href="../../index.html" class="back-button">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
