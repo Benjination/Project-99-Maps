@@ -225,11 +225,14 @@
 
 @media (max-width: 768px) {
     .map-container {
+        grid-template-columns: 1fr;
         gap: 10px;
+        height: auto;
     }
 
     .map-wrapper {
         max-height: 400px;
+        min-height: 300px;
     }
 
     .locations-list {
@@ -240,5 +243,14 @@
     .location-item {
         padding: 10px;
         font-size: 13px;
+    }
+
+    .adjacent-zones {
+        flex-direction: column;
+    }
+
+    .adjacent-button {
+        width: 100%;
+        justify-content: center;
     }
 }
