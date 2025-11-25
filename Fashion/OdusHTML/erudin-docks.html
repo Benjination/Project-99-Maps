@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erudin Docks - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <link rel="stylesheet" href="../../Function/CSS/zone.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">Odus - Erudin Docks</p>
+        </header>
+
+        <nav class="location-nav">
+            <a href="../HTML/index.html" class="nav-link">Home</a>
+            <span class="nav-separator">/</span>
+            <a href="../HTML/index.html" class="nav-link">Odus</a>
+            <span class="nav-separator">/</span>
+            <span class="nav-current">Erudin Docks</span>
+        </nav>
+
+        <nav class="adjacent-zones">
+            <a href="../HTML/under-construction.html" class="adjacent-button">← Qeynos</a>
+            <a href="erudin.html" class="adjacent-button">Erudin →</a>
+        </nav>
+
+        <div class="map-container">
+            <div class="map-wrapper">
+                <div id="map-image" class="map-image">
+                    <img id="zone-map" src="../../Images/Odus/ErudinDocks.png" alt="Erudin Docks Map">
+                    <div id="map-overlay"></div>
+                </div>
+            </div>
+            <div id="locations-list" class="locations-list"></div>
+        </div>
+    </div>
+
+    <script type="module" src="../../Function/zone-init.js"></script>
+    <script src="../../Function/page-check.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paineel 2 - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="paineel.html" class="back-link">Paineel</a>
+            <h1>Paineel 2</h1>
+            <p class="subtitle">The Hidden City of Heretics - Part 2</p>
+        </header>
+
+        <nav class="location-nav">
+            <a href="../HTML/index.html">Home</a>
+            <span class="separator">/</span>
+            <a href="../HTML/index.html">Odus</a>
+            <span class="separator">/</span>
+            <a href="paineel.html">Paineel</a>
+            <span class="separator">/</span>
+            <span class="current">Paineel 2</span>
+        </nav>
+
+        <nav class="adjacent-zones">
+            <a href="paineel.html" class="adjacent-button">Paineel →</a>
+            <a href="toxulia-forest.html" class="adjacent-button">Toxulia Forest</a>
+            <a href="the-warrens.html" class="adjacent-button">The Warrens →</a>
+            <a href="the-hole.html" class="adjacent-button">The Hole →</a>
+        </nav>
+
+        <main id="map-container">
+            <section class="map-viewer">
+                <div class="map-image-wrapper">
+                    <img id="paineel-2-map" src="../../Images/Odus/Paineel2.png" alt="Paineel 2 Map" class="map-image">
+                    <div id="map-overlay" class="map-overlay"></div>
+                </div>
+                <div class="map-info">
+                    <h2>Locations</h2>
+                    <div id="locations-list" class="locations-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="../../Function/zone-init.js"></script>
+</body>
+</html>

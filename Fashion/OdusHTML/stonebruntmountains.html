@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stonebrunt Mountains - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <link rel="stylesheet" href="../../Function/CSS/zone.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">Odus - Stonebrunt Mountains</p>
+        </header>
+
+        <nav class="location-nav">
+            <a href="../HTML/index.html" class="nav-link">Home</a>
+            <span class="nav-separator">/</span>
+            <a href="../HTML/index.html" class="nav-link">Odus</a>
+            <span class="nav-separator">/</span>
+            <span class="nav-current">Stonebrunt Mountains</span>
+        </nav>
+
+        <nav class="adjacent-zones">
+            <a href="the-warrens.html" class="adjacent-button">← The Warrens</a>
+        </nav>
+
+        <div class="map-container">
+            <div class="map-wrapper">
+                <div id="map-image" class="map-image">
+                    <img id="zone-map" src="../../Images/Odus/StonebruntMountains.png" alt="Stonebrunt Mountains Map">
+                    <div id="map-overlay"></div>
+                </div>
+            </div>
+            <div id="locations-list" class="locations-list"></div>
+        </div>
+    </div>
+
+    <script type="module" src="../../Function/zone-init.js"></script>
+</body>
+</html>
