@@ -4,8 +4,12 @@
  */
 
 import { detectCurrentZone, loadZoneData, renderLocationsList, setMapImage, renderMapButtons } from './map-utils.js';
+import { initBuilderMode } from './builder-mode.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
+    // Check if builder mode should be activated first
+    const builderModeActive = initBuilderMode();
+    
     const zoneId = detectCurrentZone();
     console.log('Detected zone:', zoneId);
     
@@ -16,7 +20,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log(`${zoneId} data:`, zoneData);
         if (zoneData) {
             console.log('Rendering locations:', zoneData.locations.length);
-            renderLocationsList(zoneData.locations);
+            if (!builderModeActive) {
+                renderLocationsList(zoneData.locations);
+            }
             setMapImage(zoneData);
             // Render navigation buttons if they exist
             if (zoneData.buttons) {
@@ -30,7 +36,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('Zone data:', zoneData);
         if (zoneData) {
             console.log('Rendering locations:', zoneData.locations.length);
-            renderLocationsList(zoneData.locations);
+            if (!builderModeActive) {
+                renderLocationsList(zoneData.locations);
+            }
             setMapImage(zoneData);
             // Render navigation buttons if they exist
             if (zoneData.buttons) {

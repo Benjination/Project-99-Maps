@@ -40,6 +40,46 @@
     color: #ffed4e;
 }
 
+.adjacent-zones {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 12px 0;
+    border-bottom: 1px solid #444;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.adjacent-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid #ffd700;
+    border-radius: 3px;
+    background-color: transparent;
+    color: #ffd700;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.adjacent-button:before {
+    content: "→";
+    font-weight: bold;
+}
+
+.adjacent-button:hover {
+    background-color: rgba(255, 215, 0, 0.1);
+    border-color: #ffed4e;
+    color: #ffed4e;
+}
+
+.adjacent-button.back:before {
+    content: "←";
+}
+
 .map-container {
     display: grid;
     grid-template-columns: 1fr 300px;
