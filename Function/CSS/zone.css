@@ -103,8 +103,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     width: 100%;
     height: 100%;
+    gap: 10px;
 }
 
 .map-image img {
@@ -114,6 +116,11 @@
     width: auto;
     height: auto;
     object-fit: contain;
+}
+
+/* For dual-level zones (like Erudin Palace) */
+.map-image.dual-level img {
+    max-width: calc(50% - 5px);
 }
 
 #map-overlay {

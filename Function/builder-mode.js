@@ -103,6 +103,32 @@ const LOCATION_NAMES_BY_ZONE = {
         'Cave of Sujah',
         'Tiger Island',
         'Tiger Training Pit'
+    ],
+    'eruds-crossing': [
+        'Sunken Haunted Ship',
+        'Ancient Statues',
+        'Volcanic Crater',
+        'Merchant',
+        'Dock for boat to Erudin'
+    ],
+    'erudin-docks': [
+        'Merchant - Bags and Boxes',
+        'Erudin Port Authority',
+        'Merchant - Cooking Supplies',
+        'Priest of Discord',
+        'Teleporter to Erudin',
+        'Teleporter Arrival Platform'
+    ],
+    'erudin-palace': [
+        'Teleporter Arrival Platform / Teleporter to Erudin',
+        'Bank of Erudin',
+        'Erudin City Office',
+        'Sothure\'s Fine Gems',
+        'Vials of Vitality',
+        'Tower of the Crimson Hands',
+        'Tower of the Gate Callers',
+        'Tower of the Craft Keepers',
+        'Merchant - Common Spells'
     ]
 };
 

@@ -17,6 +17,8 @@ export const zoneData = {
         { number: 11, name: 'BlueHawk\'s Food', x: 428, y: 1032 }
     ],
     buttons: [
-        { name: 'Toxulia Forest', link: 'toxulia-forest.html', x: 527, y: 1378 }
+        { name: 'The Docks', link: 'erudin-docks.html', x: 415, y: 509 },
+        { name: 'Erudin Palace', link: 'erudin-palace.html', x: 556, y: 456 },
+        { name: 'Toxxulia Forest', link: 'toxulia-forest.html', x: 542, y: 1364 }
     ]
 };

@@ -4,25 +4,24 @@ export const zoneData = {
     suggestedLevel: '5-15',
     mapImage: '../../Images/Odus/The Hole.png',
     locations: [
-        { number: 1, name: 'West Tower', x: 400, y: 300 },
-        { number: 2, name: 'East Tower', x: 500, y: 400 },
-        { number: 3, name: 'High Scale Kirn Room', x: 600, y: 350 },
-        { number: 4, name: 'West Graveyard', x: 450, y: 500 },
-        { number: 5, name: 'East Graveyard', x: 550, y: 550 },
-        { number: 6, name: 'Courtyard', x: 500, y: 200 },
-        { number: 7, name: 'Master Yael Chamber', x: 600, y: 450 },
-        { number: 8, name: 'Pool Room', x: 400, y: 600 },
-        { number: 9, name: 'Mighty Room', x: 550, y: 650 },
-        { number: 10, name: 'Observation Room', x: 700, y: 400 },
-        { number: 11, name: 'Secret Vault', x: 350, y: 450 },
-        { number: 12, name: 'Mushroom Cellar', x: 300, y: 300 },
-        { number: 13, name: 'Jail Cell', x: 650, y: 200 },
-        { number: 14, name: 'Jail Cell', x: 700, y: 250 },
-        { number: 15, name: 'Entry Observation Tower', x: 400, y: 100 },
-        { number: 16, name: 'Zone Out Room', x: 200, y: 150 }
+        { number: 1, name: 'West Tower', x: 764, y: 548 },
+        { number: 2, name: 'East Tower', x: 692, y: 551 },
+        { number: 3, name: 'High Scale Kirn Room', x: 726, y: 571 },
+        { number: 4, name: 'West Graveyard', x: 759, y: 651 },
+        { number: 5, name: 'East Graveyard', x: 693, y: 647 },
+        { number: 6, name: 'Courtyard', x: 724, y: 690 },
+        { number: 7, name: 'Master Yael Chamber', x: 606, y: 669 },
+        { number: 8, name: 'Pool Room', x: 885, y: 913 },
+        { number: 9, name: 'Mighty Room', x: 600, y: 1269 },
+        { number: 10, name: 'Observation Room', x: 591, y: 1322 },
+        { number: 11, name: 'Secret Vault', x: 631, y: 1052 },
+        { number: 12, name: 'Mushroom Cellar', x: 483, y: 943 },
+        { number: 13, name: 'Jail Cell', x: 481, y: 848 },
+        { number: 14, name: 'Jail Cell', x: 432, y: 809 },
+        { number: 15, name: 'Entry Observation Tower', x: 246, y: 815 },
+        { number: 16, name: 'Zone Out Room', x: 662, y: 1021 }
     ],
     buttons: [
-        { name: 'Paineel', link: 'paineel.html', x: 900, y: 400 },
-        { name: 'Stonebrunt Mountains', link: '#', x: 100, y: 400 }
+        { name: 'Paineel', link: 'paineel-2.html', x: 138, y: 726 }
     ]
 };
