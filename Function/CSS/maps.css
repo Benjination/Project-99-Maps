@@ -79,12 +79,18 @@ header h1 {
     background: #2a2a2a;
     border: 2px solid #444;
     border-top: none;
-    border-radius: 0 0 4px 4px;
+    border-radius: 0 4px 4px 4px;
     padding: 15px;
     margin-top: -4px;
-    min-width: 220px;
+    min-width: max-content;
     z-index: 100;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    max-width: calc(100vw - 40px);
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 .submenu.hidden {
@@ -92,7 +98,9 @@ header h1 {
 }
 
 .submenu-section {
-    margin-bottom: 15px;
+    margin-bottom: 0;
+    min-width: 220px;
+    flex: 0 0 auto;
 }
 
 .submenu-section:last-child {

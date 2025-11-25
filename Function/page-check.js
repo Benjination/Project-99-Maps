@@ -7,14 +7,27 @@ async function checkPageExists() {
         
         // If we get a 404, redirect to under-construction
         if (response.status === 404) {
-            window.location.href = '/Project-99-Maps/Fashion/HTML/under-construction.html';
+            const pathname = window.location.pathname;
+            // Check if this is a page in any Fashion subdirectory (Fashion/*/*.html)
+            const isFashionSubdirectoryPage = /\/Fashion\/[^/]+\//.test(pathname);
+            
+            if (isFashionSubdirectoryPage) {
+                // Use relative path to go up two levels and to under-construction
+                window.location.href = '../../Fashion/HTML/under-construction.html';
+            } else {
+                // Fallback for other pages
+                window.location.href = '/Project-99-Maps/Fashion/HTML/under-construction.html';
+            }
         }
     } catch (error) {
         // If there's a network error, assume page doesn't exist
         console.error('Error checking page:', error);
-        // Only redirect if this appears to be a zone page
-        if (window.location.pathname.includes('/Fashion/HTML/')) {
-            window.location.href = '/Project-99-Maps/Fashion/HTML/under-construction.html';
+        const pathname = window.location.pathname;
+        // Check if this is a page in any Fashion subdirectory (Fashion/*/*.html)
+        const isFashionSubdirectoryPage = /\/Fashion\/[^/]+\//.test(pathname);
+        
+        if (isFashionSubdirectoryPage) {
+            window.location.href = '../../Fashion/HTML/under-construction.html';
         }
     }
 }

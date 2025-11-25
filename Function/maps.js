@@ -1,28 +1,48 @@
 document.addEventListener('DOMContentLoaded', function() {
     const zoneButtons = document.querySelectorAll('.zone-button');
-    const odusSubmenu = document.getElementById('odus-submenu');
-    const odusButton = document.querySelector('[data-zone="odus"]');
+    let activeSubmenu = null;
+    let activeButton = null;
 
     // Handle zone button clicks
     zoneButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             const zone = this.getAttribute('data-zone');
+            const submenuId = `${zone}-submenu`;
+            const submenu = document.getElementById(submenuId);
             
-            // Remove active class from all buttons
-            zoneButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            this.classList.add('active');
-
-            // Handle Odus submenu toggle
-            if (zone === 'odus') {
+            // If this button has a submenu
+            if (submenu) {
                 e.preventDefault();
-                odusButton.classList.toggle('active');
-                odusSubmenu.classList.toggle('hidden');
+                
+                // If clicking the same button, toggle the submenu
+                if (activeButton === this) {
+                    submenu.classList.toggle('hidden');
+                    this.classList.toggle('active');
+                } else {
+                    // Hide previous submenu
+                    if (activeSubmenu) {
+                        activeSubmenu.classList.add('hidden');
+                        activeButton.classList.remove('active');
+                    }
+                    
+                    // Show new submenu
+                    submenu.classList.remove('hidden');
+                    this.classList.add('active');
+                    activeSubmenu = submenu;
+                    activeButton = this;
+                }
             } else {
-                // Hide submenu if clicking other zones
-                odusSubmenu.classList.add('hidden');
-                odusButton.classList.remove('active');
+                // No submenu for this zone, hide any open submenu
+                if (activeSubmenu) {
+                    activeSubmenu.classList.add('hidden');
+                    activeButton.classList.remove('active');
+                    activeSubmenu = null;
+                    activeButton = null;
+                }
+                // Remove active class from all buttons
+                zoneButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
             }
         });
     });
@@ -30,8 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close submenu when clicking elsewhere
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.zone-item')) {
-            odusSubmenu.classList.add('hidden');
-            odusButton.classList.remove('active');
+            if (activeSubmenu) {
+                activeSubmenu.classList.add('hidden');
+                activeButton.classList.remove('active');
+                activeSubmenu = null;
+                activeButton = null;
+            }
         }
     });
 });

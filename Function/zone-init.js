@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Special handling for pages with different image element IDs
     if (zoneId === 'paineel' || zoneId === 'paineel-2') {
         console.log(`Loading ${zoneId} data...`);
-        const { zoneData } = await import(`./Data/data-${zoneId}.js`);
+        const { zoneData } = await import(`./DataJS/OdusJS/data-${zoneId}.js`);
         console.log(`${zoneId} data:`, zoneData);
         if (zoneData) {
             console.log('Rendering locations:', zoneData.locations.length);

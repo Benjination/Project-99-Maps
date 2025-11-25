@@ -267,11 +267,19 @@ export function detectCurrentZone() {
  */
 export async function loadZoneData(zoneId) {
     try {
-        const module = await import(`./Data/data-${zoneId}.js`);
+        // Try to load from OdusJS first
+        const module = await import(`./DataJS/OdusJS/data-${zoneId}.js`);
         return module.zoneData;
     } catch (error) {
-        console.error(`Failed to load zone data for ${zoneId}:`, error);
-        return null;
+        // Fall back to AntonicaJS for Antonica zones
+        try {
+            const module = await import(`./DataJS/AntonicaJS/data-${zoneId}.js`);
+            return module.zoneData;
+        } catch (fallbackError) {
+            // Can add more continent JS folders here as needed
+            console.error(`Failed to load zone data for ${zoneId}:`, fallbackError);
+            return null;
+        }
     }
 }
 

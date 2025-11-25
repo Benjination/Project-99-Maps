@@ -6,8 +6,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
-    # If it's a zone HTML file, redirect to under-construction
-    RewriteRule ^Fashion/HTML/.*\.html$ Fashion/HTML/under-construction.html [L]
+    # If it's a zone HTML file in any Fashion subdirectory, redirect to under-construction
+    # Catches Fashion/OdusHTML/*.html, Fashion/AntonicaHTML/*.html, etc.
+    RewriteRule ^Fashion/[^/]+/.*\.html$ Fashion/HTML/under-construction.html [R=302,L]
 </IfModule>
 
 # Alternative: ErrorDocument approach

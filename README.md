@@ -1,3 +1,6 @@
+
+Site: https://benjination.github.io/Project-99-Maps/
+
 # Project 1999 Maps
 
 An interactive web-based mapping system for Project 1999 EverQuest zones. Browse detailed zone maps with clickable location markers and navigate between adjacent zones.
