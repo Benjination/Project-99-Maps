@@ -8,7 +8,7 @@ import { initBuilderMode } from './builder-mode.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
     // Check if builder mode should be activated first
-    const builderModeActive = initBuilderMode();
+    const builderModeActive = await initBuilderMode();
     
     const zoneId = detectCurrentZone();
     console.log('Detected zone:', zoneId);

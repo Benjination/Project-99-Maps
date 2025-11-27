@@ -203,7 +203,16 @@ export function highlightLocationInstances(locationNumber, locations) {
     const imgRect = mapImage.getBoundingClientRect();
     const wrapperRect = wrapper.getBoundingClientRect();
     
-    // Image natural dimensions in draw.io coordinates
+    // Get actual img element for natural dimensions
+    let actualImg = mapImage;
+    if (mapImage && mapImage.tagName !== 'IMG') {
+        actualImg = mapImage.querySelector('img');
+    }
+    
+    const imgNaturalWidth = actualImg?.naturalWidth || 1092; // Default to Qeynos Aquaducts size
+    const imgNaturalHeight = actualImg?.naturalHeight || 1306;
+    
+    // Image natural dimensions in draw.io coordinates (for old Odus zones)
     const drawioWidth = 755;
     const drawioHeight = 800;
     const drawioLeft = 140;
@@ -217,13 +226,32 @@ export function highlightLocationInstances(locationNumber, locations) {
     const instances = locations.filter(loc => loc.number === locationNumber);
     
     instances.forEach(location => {
-        // Convert desired coordinates to draw.io coordinates
-        const drawio_x = drawioLeft + ((1000 - location.x) / 1000) * drawioWidth;
-        const drawio_y = drawioTop + ((location.y - 400) / 1000) * drawioHeight;
+        let pixelX, pixelY;
         
-        // Convert draw.io coordinates to pixel positions
-        const pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
-        const pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
+        // Determine if using new coordinate system (natural image pixels) or old (draw.io normalized)
+        // New system: coordinates are in natural image space (0-imgNaturalWidth, 0-imgNaturalHeight)
+        // Old system: coordinates are in normalized space (0-1000, 400-1400) with draw.io offset
+        
+        // Check if coordinates look like new system (less than natural dimensions)
+        if (location.x <= imgNaturalWidth && location.y <= imgNaturalHeight && location.y > 0) {
+            // NEW COORDINATE SYSTEM (natural image pixels)
+            // Convert natural image coordinates to displayed pixel coordinates
+            pixelX = (location.x / imgNaturalWidth) * imgRect.width;
+            pixelY = (location.y / imgNaturalHeight) * imgRect.height;
+            
+            console.log(`Location ${location.number}: NEW system (${location.x}, ${location.y}) → pixels (${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
+        } else {
+            // OLD COORDINATE SYSTEM (draw.io normalized 1000-based)
+            // Convert desired coordinates to draw.io coordinates
+            const drawio_x = drawioLeft + ((1000 - location.x) / 1000) * drawioWidth;
+            const drawio_y = drawioTop + ((location.y - 400) / 1000) * drawioHeight;
+            
+            // Convert draw.io coordinates to pixel positions
+            pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
+            pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
+            
+            console.log(`Location ${location.number}: OLD system (${location.x}, ${location.y}) → drawio (${drawio_x.toFixed(1)}, ${drawio_y.toFixed(1)}) → pixels (${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
+        }
         
         // Calculate offset of image within wrapper
         const offsetX = (imgRect.left - wrapperRect.left);

@@ -12,7 +12,7 @@ export const zoneData = {
         { number: 6, name: 'Teleporter Arrival Platform', x: 599, y: 1183 }
     ],
     buttons: [
-        { name: 'Qeynos', link: 'qeynos.html', x: 339, y: 804 },
+        { name: 'South Qeynos', link: '../AntonicaHTML/qeynos-s.html', x: 339, y: 804 },
         { name: 'Erudin', link: 'erudin.html', x: 599, y: 1101 }
     ]
 };

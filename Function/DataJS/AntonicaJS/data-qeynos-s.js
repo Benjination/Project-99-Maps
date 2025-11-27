@@ -1,0 +1,40 @@
+export const zoneData = {
+    name: 'Qeynos South',
+    region: 'Antonica',
+    description: 'South Qeynos',
+    mapImage: '../../Images/Antonica/QeynosS.png',
+    locations: [
+        { number: 1, name: 'Tin Soldier', x: 646, y: 557 },
+        { number: 2, name: 'The Wind Spirit\'s Song', x: 578, y: 542 },
+        { number: 3, name: 'Fharn\'s Leather & Thread', x: 635, y: 660 },
+        { number: 4, name: 'Bag n Barrel', x: 482, y: 571 },
+        { number: 5, name: 'Nesiff\'s Wooden Weapons', x: 511, y: 639 },
+        { number: 6, name: 'Lion\'s Mane Inn', x: 588, y: 771 },
+        { number: 7, name: 'Tax Hall', x: 487, y: 789 },
+        { number: 8, name: 'Qeynos Hold', x: 362, y: 733 },
+        { number: 9, name: 'Underwater Tunnel', x: 289, y: 743 },
+        { number: 9, name: 'Underwater Tunnel', x: 395, y: 863 },
+        { number: 10, name: 'The Herb Jar', x: 260, y: 741 },
+        { number: 11, name: 'Wizard Guild Hall', x: 223, y: 746 },
+        { number: 12, name: 'Armor Tent Merchants', x: 569, y: 866 },
+        { number: 13, name: 'Fireprides', x: 452, y: 868 },
+        { number: 14, name: 'Large Armor Tent', x: 549, y: 937 },
+        { number: 15, name: 'Boat Dock', x: 859, y: 991 },
+        { number: 16, name: 'Mermaid\'s Lure', x: 641, y: 1021 },
+        { number: 17, name: 'Mixed Goods Tent', x: 484, y: 1057 },
+        { number: 18, name: 'Warrior Training Hall', x: 253, y: 989 },
+        { number: 19, name: 'Underwater Tunnel 2', x: 795, y: 1180 },
+        { number: 20, name: 'Port Authority', x: 665, y: 1167 },
+        { number: 21, name: 'Merchant Stall', x: 650, y: 1287 },
+        { number: 22, name: 'Voleen\'s Fine Baked Goods', x: 495, y: 1180 },
+        { number: 23, name: 'Fish\'s Ale', x: 486, y: 1295 },
+        { number: 24, name: 'Temple of Thunder', x: 339, y: 1243 }
+    ],
+    buttons: [
+        { name: 'North Qeynos', link: 'qeynos-n.html', x: 624, y: 468 },
+        { name: 'North Qeynos', link: 'qeynos-n.html', x: 352, y: 558 },
+        { name: 'Erudin Docks', link: '../OdusHTML/erudin-docks.html', x: 870, y: 890 },
+        { name: 'Qeynos Aquaducts', link: 'qeynos-aquaducts.html', x: 833, y: 1248 },
+        { name: 'Qeynos Aquaducts', link: 'qeynos-aquaducts.html', x: 243, y: 848 }
+    ]
+}; 

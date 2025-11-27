@@ -132,6 +132,14 @@
     pointer-events: none;
 }
 
+#map-overlay .builder-pin {
+    pointer-events: auto;
+}
+
+.builder-pin {
+    position: absolute;
+}
+
 .locations-list {
     border: 1px solid #444;
     border-radius: 4px;

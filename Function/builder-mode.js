@@ -129,10 +129,52 @@ const LOCATION_NAMES_BY_ZONE = {
         'Tower of the Gate Callers',
         'Tower of the Craft Keepers',
         'Merchant - Common Spells'
+    ],
+    'qeynos-n': [
+        'Order of the Silent Fist',
+        'Kliknik Tunnel',
+        'Reflecting Pond',
+        'Crow\'s Pub & Casino',
+        'Galliway\'s Trading Post',
+        'Ironforge\'s',
+        'Jewelbox',
+        'Ironforges\' Estate',
+        'Armor Merchant',
+        'The Cobbler',
+        'Weapon & Spell Merchant',
+        'Temple of Life'
+    ],
+    'qeynos-s': [
+        'Tin Soldier',
+        'The Wind Spirit\'s Song',
+        'Fharn\'s Leather & Thread',
+        'Bag n Barrel',
+        'Nesiff\'s Wooden Weapons',
+        'Lion\'s Mane Inn',
+        'Tax Hall',
+        'Qeynos Hold',
+        'Underwater Tunnel',
+        'The Herb Jar',
+        'Wizard Guild Hall',
+        'Armor Tent Merchants',
+        'Fireprides',
+        'Large Armor Tent',
+        'Boat Dock',
+        'Mermaid\'s Lure',
+        'Mixed Goods Tent',
+        'Warrior Training Hall',
+        'Underwater Tunnel 2',
+        'Port Authority',
+        'Merchant Stall',
+        'Voleen\'s Fine Baked Goods',
+        'Fish\'s Ale',
+        'Temple of Thunder'
     ]
 };
 
 let LOCATION_NAMES = [];
+let LOCATION_DATA = []; // Store full location objects with numbers/identifiers
+let ZONE_NAME = 'Unknown'; // Store the zone name for export
 let MAX_LOCATIONS = 11;
 
 let placedLocations = {};
@@ -140,7 +182,7 @@ let placedButtons = {};
 let nextLocationNumber = 1;
 let builderMode = 'locations'; // 'locations' or 'buttons'
 
-export function initBuilderMode() {
+export async function initBuilderMode() {
     // Check if builder mode is enabled via query parameter
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('builder') !== 'true') {
@@ -151,14 +193,76 @@ export function initBuilderMode() {
     const url = window.location.pathname;
     const filename = url.split('/').pop().replace('.html', '');
     
-    // Set location names and max locations based on zone
-    LOCATION_NAMES = LOCATION_NAMES_BY_ZONE[filename] || [];
-    MAX_LOCATIONS = LOCATION_NAMES.length;
+    // Load location names from zone data file dynamically
+    await loadLocationNamesFromZoneData(filename);
 
     console.log(`🔨 Builder Mode Activated for ${filename} (${MAX_LOCATIONS} locations)`);
     setupBuilderUI(filename);
     setupMapClickListener();
+
     return true;
+}
+
+/**
+ * Load location names from zone data file dynamically
+ * Tries to load from OdusJS first, then AntonicaJS, with fallback to hardcoded data
+ */
+async function loadLocationNamesFromZoneData(zoneId) {
+    try {
+        // Try to load from OdusJS first
+        try {
+            const module = await import(`./DataJS/OdusJS/data-${zoneId}.js`);
+            if (module.zoneData && module.zoneData.locations) {
+                LOCATION_DATA = module.zoneData.locations;
+                LOCATION_NAMES = LOCATION_DATA.map(loc => loc.name);
+                ZONE_NAME = module.zoneData.name || 'Unknown';
+                MAX_LOCATIONS = LOCATION_NAMES.length;
+                console.log(`📍 Loaded ${MAX_LOCATIONS} locations from OdusJS data`);
+                return;
+            }
+        } catch (e) {
+            // Try AntonicaJS
+            try {
+                const module = await import(`./DataJS/AntonicaJS/data-${zoneId}.js`);
+                if (module.zoneData && module.zoneData.locations) {
+                    LOCATION_DATA = module.zoneData.locations;
+                    LOCATION_NAMES = LOCATION_DATA.map(loc => loc.name);
+                    ZONE_NAME = module.zoneData.name || 'Unknown';
+                    MAX_LOCATIONS = LOCATION_NAMES.length;
+                    console.log(`📍 Loaded ${MAX_LOCATIONS} locations from AntonicaJS data`);
+                    return;
+                }
+            } catch (e2) {
+                // Continue to fallback
+            }
+        }
+        
+        // Fallback to hardcoded data if available
+        if (LOCATION_NAMES_BY_ZONE[zoneId]) {
+            LOCATION_NAMES = LOCATION_NAMES_BY_ZONE[zoneId];
+            // For hardcoded data, create location data with numeric IDs
+            LOCATION_DATA = LOCATION_NAMES.map((name, index) => ({
+                number: index + 1,
+                name: name
+            }));
+            MAX_LOCATIONS = LOCATION_NAMES.length;
+            console.log(`📍 Loaded ${MAX_LOCATIONS} locations from hardcoded data`);
+        } else {
+            console.warn(`⚠️ No location data found for ${zoneId}, builder will have 0 locations`);
+        }
+    } catch (error) {
+        console.error('Error loading zone data:', error);
+        // Fallback to hardcoded or empty
+        if (LOCATION_NAMES_BY_ZONE[zoneId]) {
+            LOCATION_NAMES = LOCATION_NAMES_BY_ZONE[zoneId];
+            // For hardcoded data, create location data with numeric IDs
+            LOCATION_DATA = LOCATION_NAMES.map((name, index) => ({
+                number: index + 1,
+                name: name
+            }));
+            MAX_LOCATIONS = LOCATION_NAMES.length;
+        }
+    }
 }
 
 function setupBuilderUI(zoneId) {
@@ -297,6 +401,16 @@ function setupBuilderUI(zoneId) {
         container.style.marginRight = '350px';
     }
 
+    // Hide the normal locations-list and adjust map-container to full width
+    const locationsList = document.getElementById('locations-list');
+    if (locationsList) {
+        locationsList.style.display = 'none';
+    }
+    const mapContainer = document.querySelector('.map-container');
+    if (mapContainer) {
+        mapContainer.style.gridTemplateColumns = '1fr'; // Full width instead of '1fr 300px'
+    }
+
     // Add event listeners
     document.getElementById('builder-mode-locations').addEventListener('click', function() {
         builderMode = 'locations';
@@ -336,41 +450,86 @@ function setupMapClickListener() {
         mapContainer = document.querySelector('.map-overlay');
     }
 
+    // If mapImage is a container div, find the actual img element inside it
+    let actualImg = mapImage;
+    if (mapImage && mapImage.tagName !== 'IMG') {
+        actualImg = mapImage.querySelector('img');
+    }
+
     if (!mapImage || !mapContainer) {
         console.error('Map elements not found. Map ID:', mapImage?.id, 'Overlay ID:', mapContainer?.id);
         return;
     }
 
-    console.log('Map click listener setup on:', mapImage.id);
+    console.log('Map click listener setup on:', mapImage.id, 'Actual image:', actualImg?.id || actualImg?.tagName);
 
-    mapImage.addEventListener('click', function(e) {
-        const rect = mapImage.getBoundingClientRect();
-        const wrapperRect = mapImage.parentElement.getBoundingClientRect();
+    // Attach click listener directly to the actual image element
+    if (actualImg) {
+        actualImg.addEventListener('click', function(e) {
+            // The actual img element's bounds
+            // Get the container bounds (same as used in display)
+            const containerRect = mapImage.getBoundingClientRect();
+            
+            console.log(`🖱️ IMG DETAILS: naturalWidth=${this.naturalWidth}, naturalHeight=${this.naturalHeight}, containerWidth=${containerRect.width}, containerHeight=${containerRect.height}`);
+            console.log(`🖱️ VIEWPORT CLICK: clientX=${e.clientX}, clientY=${e.clientY}`);
+            console.log(`🖱️ CONTAINER BOUNDS: left=${containerRect.left}, top=${containerRect.top}, width=${containerRect.width}, height=${containerRect.height}`);
 
-        // Get pixel coordinates relative to the image
-        const pixelX = e.clientX - rect.left;
-        const pixelY = e.clientY - rect.top;
+            // Get pixel coordinates relative to the container
+            const pixelX = e.clientX - containerRect.left;
+            const pixelY = e.clientY - containerRect.top;
 
-        // Get image natural/displayed dimensions
-        const imgWidth = rect.width;
-        const imgHeight = rect.height;
+            // Get image natural/displayed dimensions
+            const imgNaturalWidth = this.naturalWidth;
+            const imgNaturalHeight = this.naturalHeight;
+            
+            // Scale from container coordinates to natural image coordinates
+            const x = Math.round((pixelX / containerRect.width) * imgNaturalWidth);
+            const y = Math.round((pixelY / containerRect.height) * imgNaturalHeight);
 
-        // Convert to normalized coordinates (0-1000 range)
-        // X: reversed (left=1000, right=0)
-        // Y: 400-1400 range
-        const normX = 1000 - (pixelX / imgWidth) * 1000;
-        const normY = 400 + (pixelY / imgHeight) * 1000;
+            console.log(`🖱️ CLICK DETAILS: container=${containerRect.width}x${containerRect.height}, natural=${imgNaturalWidth}x${imgNaturalHeight}, clickPixelInContainer=(${pixelX},${pixelY}), storedCoord=(${x},${y})`);
 
-        // Round to nearest integer
-        const x = Math.round(normX);
-        const y = Math.round(normY);
+            if (builderMode === 'locations') {
+                placePin(x, y);
+            } else {
+                placeButton(x, y);
+            }
+        });
+    } else {
+        // Fallback: attach to map-image container if img not found
+        mapImage.addEventListener('click', function(e) {
+            // Use the container for coordinate calculation (same as main handler)
+            const containerRect = mapImage.getBoundingClientRect();
+            const wrapperRect = mapImage.parentElement.getBoundingClientRect();
 
-        if (builderMode === 'locations') {
-            placePin(x, y);
-        } else {
-            placeButton(x, y);
-        }
-    });
+            console.log(`🖱️ FALLBACK HANDLER: clicking on container`);
+
+            // Get pixel coordinates relative to the container
+            const pixelX = e.clientX - containerRect.left;
+            const pixelY = e.clientY - containerRect.top;
+
+            // Get image natural/displayed dimensions from actual img element
+            let imgNaturalWidth = actualImg?.naturalWidth;
+            let imgNaturalHeight = actualImg?.naturalHeight;
+            
+            if (!imgNaturalWidth || !imgNaturalHeight) {
+                // Fallback to container dimensions if natural not available
+                imgNaturalWidth = containerRect.width;
+                imgNaturalHeight = containerRect.height;
+            }
+
+            // Scale from container coordinates to natural image coordinates
+            const x = Math.round((pixelX / containerRect.width) * imgNaturalWidth);
+            const y = Math.round((pixelY / containerRect.height) * imgNaturalHeight);
+
+            console.log(`🖱️ FALLBACK CLICK: container=${containerRect.width}x${containerRect.height}, natural=${imgNaturalWidth}x${imgNaturalHeight}, clickPixel=(${pixelX},${pixelY}), storedCoord=(${x},${y})`);
+
+            if (builderMode === 'locations') {
+                placePin(x, y);
+            } else {
+                placeButton(x, y);
+            }
+        });
+    }
 }
 
 function updateButtonsList() {
@@ -405,40 +564,60 @@ function updateButtonsList() {
 function placePin(x, y) {
     // Build list of available locations with duplicates allowed
     const locationOptions = [];
-    for (let i = 1; i <= MAX_LOCATIONS; i++) {
-        locationOptions.push(`${i}. ${LOCATION_NAMES[i - 1]}`);
+    for (let i = 0; i < LOCATION_DATA.length; i++) {
+        const locData = LOCATION_DATA[i];
+        locationOptions.push(`${locData.number}. ${locData.name}`);
     }
 
-    const choice = prompt('Select location number:\n\n' + locationOptions.join('\n'));
+    const choice = prompt('Select location:\n\n' + locationOptions.join('\n'));
     if (!choice) return;
 
-    const locationNum = parseInt(choice);
-    if (isNaN(locationNum) || locationNum < 1 || locationNum > MAX_LOCATIONS) {
-        alert('Invalid location number!');
+    // Parse the choice - can be a number or letter or alphanumeric
+    const colonIndex = choice.indexOf('.');
+    let locationIdentifier;
+    
+    if (colonIndex > 0) {
+        locationIdentifier = choice.substring(0, colonIndex).trim();
+    } else {
+        locationIdentifier = choice.trim();
+    }
+
+    // Find the location data by identifier (works for numbers, letters, or combinations like "8a")
+    const locationData = LOCATION_DATA.find(loc => String(loc.number) === locationIdentifier);
+    
+    if (!locationData) {
+        alert(`Invalid location: ${locationIdentifier}`);
         return;
     }
 
-    const locationName = LOCATION_NAMES[locationNum - 1];
+    const locationName = locationData.name;
 
     // Generate unique key for multiple instances of same location
-    const instanceKey = `${locationNum}_${Date.now()}_${Math.random()}`;
+    const instanceKey = `${locationIdentifier}_${Date.now()}_${Math.random()}`;
 
     // Store location - allow duplicates by using a unique key
     placedLocations[instanceKey] = {
-        number: locationNum,
+        number: locationData.number,
         name: locationName,
         x: x,
         y: y
     };
 
+    console.log('💾 Stored location:', {
+        key: instanceKey,
+        number: locationData.number,
+        name: locationName,
+        coords: { x, y }
+    });
+
     // Create visual pin on map
-    createVisualPin(x, y, locationNum);
+    createVisualPin(x, y, locationData.number);
 
     // Update UI
     updateLocationsList();
     updateExportText();
 
-    console.log(`📍 Placed location ${locationNum} (${locationName}) at (${x}, ${y})`);
+    console.log(`📍 Placed location ${locationData.number} (${locationName}) at (${x}, ${y})`);
 }
 
 function createButtonMarker(x, y, buttonId) {
@@ -600,6 +779,12 @@ function createVisualPin(x, y, locationNum) {
         overlay = document.querySelector('.map-overlay');
     }
 
+    // If mapImage is a container div, find the actual img element inside it
+    let actualImg = mapImage;
+    if (mapImage && mapImage.tagName !== 'IMG') {
+        actualImg = mapImage.querySelector('img');
+    }
+
     const wrapper = mapImage?.parentElement;
 
     if (!mapImage || !overlay || !wrapper) {
@@ -607,24 +792,29 @@ function createVisualPin(x, y, locationNum) {
         return;
     }
 
-    // Get dimensions
+    // Get the container bounds (same as map-utils.js does)
     const imgRect = mapImage.getBoundingClientRect();
-    const wrapperRect = wrapper.getBoundingClientRect();
+    const wrapperRect = mapImage.parentElement.getBoundingClientRect();
+    
+    // Get natural dimensions from the actual img element
+    const imgNaturalWidth = actualImg?.naturalWidth || imgRect.width;
+    const imgNaturalHeight = actualImg?.naturalHeight || imgRect.height;
 
-    // Convert back to pixel coordinates
-    const drawioWidth = 755;
-    const drawioHeight = 800;
-    const drawioLeft = 140;
-    const drawioTop = 350;
+    // Convert natural image coordinates to displayed pixel coordinates
+    // Using the CONTAINER width/height (not the actual image width/height)
+    // This matches map-utils.js approach
+    const pixelX = (x / imgNaturalWidth) * imgRect.width;
+    const pixelY = (y / imgNaturalHeight) * imgRect.height;
 
-    const drawio_x = drawioLeft + ((1000 - x) / 1000) * drawioWidth;
-    const drawio_y = drawioTop + ((y - 400) / 1000) * drawioHeight;
-
-    const pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
-    const pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
-
-    const offsetX = (imgRect.left - wrapperRect.left);
-    const offsetY = (imgRect.top - wrapperRect.top);
+    // Calculate offset of container within wrapper
+    const offsetX = imgRect.left - wrapperRect.left;
+    const offsetY = imgRect.top - wrapperRect.top;
+    
+    // Position the pin using the same formula as map-utils.js
+    const pinLeft = offsetX + pixelX - 15;
+    const pinTop = offsetY + pixelY - 15;
+    
+    console.log(`Pin calc (matching map-utils): container_offset=(${offsetX},${offsetY}), pixel_in_container=(${pixelX.toFixed(1)},${pixelY.toFixed(1)}), final=(${pinLeft.toFixed(1)},${pinTop.toFixed(1)})`);
 
     // Create pin element
     const pin = document.createElement('div');
@@ -632,8 +822,8 @@ function createVisualPin(x, y, locationNum) {
     pin.dataset.locationNum = locationNum;
     pin.style.cssText = `
         position: absolute;
-        left: ${offsetX + pixelX - 15}px;
-        top: ${offsetY + pixelY - 15}px;
+        left: ${pinLeft}px;
+        top: ${pinTop}px;
         width: 30px;
         height: 30px;
         border-radius: 50%;
@@ -655,6 +845,7 @@ function createVisualPin(x, y, locationNum) {
     // Make draggable
     makePinDraggable(pin, locationNum);
 
+    // Append to overlay (which is already positioned within map-image)
     overlay.appendChild(pin);
 }
 
@@ -726,26 +917,37 @@ function makePinDraggable(pin, locationNum) {
         if (!mapImage) mapImage = document.getElementById('paineel-map');
         if (!mapImage) mapImage = document.getElementById('paineel-2-map');
         
+        // If mapImage is a container div, find the actual img element inside it
+        let actualImg = mapImage;
+        if (mapImage && mapImage.tagName !== 'IMG') {
+            actualImg = mapImage.querySelector('img');
+        }
+
         const wrapper = mapImage.parentElement;
-        const imgRect = mapImage.getBoundingClientRect();
+        const imgRect = actualImg?.getBoundingClientRect() || mapImage.getBoundingClientRect();
         const wrapperRect = wrapper.getBoundingClientRect();
 
         const pixelX = e.clientX - imgRect.left;
         const pixelY = e.clientY - imgRect.top;
 
-        const normX = 1000 - (pixelX / imgRect.width) * 1000;
-        const normY = 400 + (pixelY / imgRect.height) * 1000;
+        // Get natural image dimensions to convert pixel coordinates
+        const imgNaturalWidth = actualImg?.naturalWidth || imgRect.width;
+        const imgNaturalHeight = actualImg?.naturalHeight || imgRect.height;
+
+        // Convert displayed pixel coordinates to natural image coordinates
+        const x = Math.round((pixelX / imgRect.width) * imgNaturalWidth);
+        const y = Math.round((pixelY / imgRect.height) * imgNaturalHeight);
 
         // Update using the instance key, or find the right one
         if (currentInstanceKey && placedLocations[currentInstanceKey]) {
-            placedLocations[currentInstanceKey].x = Math.round(normX);
-            placedLocations[currentInstanceKey].y = Math.round(normY);
+            placedLocations[currentInstanceKey].x = x;
+            placedLocations[currentInstanceKey].y = y;
         } else {
             // Fallback: find first instance of this location number
             for (const key in placedLocations) {
                 if (placedLocations[key].number === locationNum) {
-                    placedLocations[key].x = Math.round(normX);
-                    placedLocations[key].y = Math.round(normY);
+                    placedLocations[key].x = x;
+                    placedLocations[key].y = y;
                     currentInstanceKey = key;
                     break;
                 }
@@ -755,7 +957,7 @@ function makePinDraggable(pin, locationNum) {
         updateLocationsList();
         updateExportText();
 
-        console.log(`↪️ Moved location ${locationNum} to (${Math.round(normX)}, ${Math.round(normY)})`);
+        console.log(`↪️ Moved location ${locationNum} to (${x}, ${y})`);
     });
 }
 
@@ -801,10 +1003,10 @@ function updateExportText() {
     if (!textarea) return;
 
     let output = 'export const zoneData = {\n';
-    output += `    name: '${LOCATION_NAMES.length === 11 ? 'Toxulia Forest' : LOCATION_NAMES.length === 17 ? 'Paineel' : 'Unknown'}',\n`;
-    output += '    region: \'Odus\',\n';
+    output += `    name: '${ZONE_NAME}',\n`;
+    output += '    region: \'Antonica\',\n';
     output += '    suggestedLevel: \'1-10\',\n';
-    output += '    mapImage: \'../../Images/Odus/...\',\n';
+    output += '    mapImage: \'../../Images/Antonica/qeynosAquaducts.png\',\n';
     output += '    locations: [\n';
 
     // Sort all placed locations by location number, maintaining multiple instances
