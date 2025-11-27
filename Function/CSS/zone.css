@@ -107,6 +107,8 @@
     width: 100%;
     height: 100%;
     gap: 10px;
+    /* Fixed aspect ratio 4:3 to match standard coordinate system (1200:900) */
+    aspect-ratio: 4 / 3;
 }
 
 .map-image img {

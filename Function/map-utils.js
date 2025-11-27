@@ -2,6 +2,37 @@
  * Shared map utilities for all zone pages
  */
 
+// ===== STANDARD COORDINATE SYSTEM =====
+// All maps use a STANDARD reference size for coordinate storage
+// This allows 200+ maps of different sizes to use the same coordinate system
+// The standard container is the reference - images scale to fit, but coordinates stay consistent
+// 
+// CRITICAL: Container size MUST be identical in builder and non-builder modes!
+// - CSS enforces 4:3 aspect ratio on .map-image to maintain consistency
+// - The actual pixel dimensions may vary based on viewport, but the aspect ratio stays constant
+// - Both builder and non-builder measure the container at runtime to ensure they convert identically
+const STANDARD_CONTAINER_WIDTH = 1200;
+const STANDARD_CONTAINER_HEIGHT = 900;
+
+// Conversion helpers to convert between actual container size and standard size
+function getActualContainerSize() {
+    const mapImage = document.getElementById('map-image') || document.getElementById('paineel-map') || document.getElementById('paineel-2-map');
+    if (!mapImage) {
+        console.warn('map image not found, using standard size as fallback');
+        return { width: STANDARD_CONTAINER_WIDTH, height: STANDARD_CONTAINER_HEIGHT };
+    }
+    const rect = mapImage.getBoundingClientRect();
+    console.log(`📏 Container size: ${rect.width.toFixed(0)}x${rect.height.toFixed(0)} (aspect: ${(rect.width/rect.height).toFixed(3)})`);
+    return { width: rect.width, height: rect.height };
+}
+
+function convertStandardToDisplayCoordinates(standardX, standardY, actualContainerWidth, actualContainerHeight) {
+    // Convert from STANDARD coordinates back to actual container pixel coordinates
+    const displayX = (standardX / STANDARD_CONTAINER_WIDTH) * actualContainerWidth;
+    const displayY = (standardY / STANDARD_CONTAINER_HEIGHT) * actualContainerHeight;
+    return { x: displayX, y: displayY };
+}
+
 /**
  * Render locations list in the sidebar
  * @param {Array} locations - Array of location objects from zone data
@@ -199,24 +230,19 @@ export function highlightLocationInstances(locationNumber, locations) {
     
     if (!mapImage || !overlay || !wrapper) return;
     
-    // Get the actual displayed dimensions of the image
-    const imgRect = mapImage.getBoundingClientRect();
-    const wrapperRect = wrapper.getBoundingClientRect();
-    
-    // Get actual img element for natural dimensions
-    let actualImg = mapImage;
-    if (mapImage && mapImage.tagName !== 'IMG') {
-        actualImg = mapImage.querySelector('img');
+    // Get the actual image element (centered within the map-image container)
+    const actualImg = mapImage.querySelector('img') || document.querySelector('#zone-map');
+    if (!actualImg) {
+        console.error('Could not find actual image element');
+        return;
     }
     
-    const imgNaturalWidth = actualImg?.naturalWidth || 1092; // Default to Qeynos Aquaducts size
-    const imgNaturalHeight = actualImg?.naturalHeight || 1306;
+    const imgRect = actualImg.getBoundingClientRect();
+    const containerRect = mapImage.getBoundingClientRect();
     
-    // Image natural dimensions in draw.io coordinates (for old Odus zones)
-    const drawioWidth = 755;
-    const drawioHeight = 800;
-    const drawioLeft = 140;
-    const drawioTop = 350;
+    // Image offset within container (due to flex centering)
+    const imgOffsetX = imgRect.left - containerRect.left;
+    const imgOffsetY = imgRect.top - containerRect.top;
     
     // Remove all previous location markers (keep buttons)
     const previousMarkers = overlay.querySelectorAll('.location-marker');
@@ -226,43 +252,21 @@ export function highlightLocationInstances(locationNumber, locations) {
     const instances = locations.filter(loc => loc.number === locationNumber);
     
     instances.forEach(location => {
-        let pixelX, pixelY;
+        // Assume all NEW locations use STANDARD coordinates
+        // (Old draw.io system support can be added back if needed)
+        const displayCoords = convertStandardToDisplayCoordinates(location.x, location.y, imgRect.width, imgRect.height);
         
-        // Determine if using new coordinate system (natural image pixels) or old (draw.io normalized)
-        // New system: coordinates are in natural image space (0-imgNaturalWidth, 0-imgNaturalHeight)
-        // Old system: coordinates are in normalized space (0-1000, 400-1400) with draw.io offset
+        const pixelX = displayCoords.x + imgOffsetX;
+        const pixelY = displayCoords.y + imgOffsetY;
         
-        // Check if coordinates look like new system (less than natural dimensions)
-        if (location.x <= imgNaturalWidth && location.y <= imgNaturalHeight && location.y > 0) {
-            // NEW COORDINATE SYSTEM (natural image pixels)
-            // Convert natural image coordinates to displayed pixel coordinates
-            pixelX = (location.x / imgNaturalWidth) * imgRect.width;
-            pixelY = (location.y / imgNaturalHeight) * imgRect.height;
-            
-            console.log(`Location ${location.number}: NEW system (${location.x}, ${location.y}) → pixels (${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
-        } else {
-            // OLD COORDINATE SYSTEM (draw.io normalized 1000-based)
-            // Convert desired coordinates to draw.io coordinates
-            const drawio_x = drawioLeft + ((1000 - location.x) / 1000) * drawioWidth;
-            const drawio_y = drawioTop + ((location.y - 400) / 1000) * drawioHeight;
-            
-            // Convert draw.io coordinates to pixel positions
-            pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
-            pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
-            
-            console.log(`Location ${location.number}: OLD system (${location.x}, ${location.y}) → drawio (${drawio_x.toFixed(1)}, ${drawio_y.toFixed(1)}) → pixels (${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
-        }
-        
-        // Calculate offset of image within wrapper
-        const offsetX = (imgRect.left - wrapperRect.left);
-        const offsetY = (imgRect.top - wrapperRect.top);
+        console.log(`Location ${location.number}: standard=(${location.x}, ${location.y}) → display=(${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
         
         // Create a circle marker at each instance
         const marker = document.createElement('div');
         marker.className = 'location-marker';
         marker.style.position = 'absolute';
-        marker.style.left = (offsetX + pixelX - 15) + 'px';
-        marker.style.top = (offsetY + pixelY - 15) + 'px';
+        marker.style.left = (pixelX - 15) + 'px';
+        marker.style.top = (pixelY - 15) + 'px';
         marker.style.width = '30px';
         marker.style.height = '30px';
         marker.style.borderRadius = '50%';

@@ -172,6 +172,44 @@ const LOCATION_NAMES_BY_ZONE = {
     ]
 };
 
+// ===== STANDARD COORDINATE SYSTEM =====
+// All maps use a STANDARD reference size for coordinate storage
+// This allows 200+ maps of different sizes to use the same coordinate system
+// The standard container is the reference - images scale to fit, but coordinates stay consistent
+// 
+// CRITICAL: Container size MUST be identical in builder and non-builder modes!
+// - CSS enforces 4:3 aspect ratio on .map-image to maintain consistency
+// - The actual pixel dimensions may vary based on viewport, but the aspect ratio stays constant
+// - Both builder and non-builder measure the container at runtime to ensure they convert identically
+const STANDARD_CONTAINER_WIDTH = 1200;  // Standard width for coordinate reference
+const STANDARD_CONTAINER_HEIGHT = 900;  // Standard height for coordinate reference
+
+// Conversion helpers to convert between actual container size and standard size
+function getActualContainerSize() {
+    const mapImage = document.getElementById('map-image');
+    if (!mapImage) {
+        console.warn('map-image not found, using standard size as fallback');
+        return { width: STANDARD_CONTAINER_WIDTH, height: STANDARD_CONTAINER_HEIGHT };
+    }
+    const rect = mapImage.getBoundingClientRect();
+    console.log(`📏 Container size: ${rect.width.toFixed(0)}x${rect.height.toFixed(0)} (aspect: ${(rect.width/rect.height).toFixed(3)})`);
+    return { width: rect.width, height: rect.height };
+}
+
+function convertClickToStandardCoordinates(containerPixelX, containerPixelY, actualContainerWidth, actualContainerHeight) {
+    // Convert from actual container pixel coordinates to STANDARD coordinates
+    const standardX = Math.round((containerPixelX / actualContainerWidth) * STANDARD_CONTAINER_WIDTH);
+    const standardY = Math.round((containerPixelY / actualContainerHeight) * STANDARD_CONTAINER_HEIGHT);
+    return { x: standardX, y: standardY };
+}
+
+function convertStandardToDisplayCoordinates(standardX, standardY, actualContainerWidth, actualContainerHeight) {
+    // Convert from STANDARD coordinates back to actual container pixel coordinates
+    const displayX = (standardX / STANDARD_CONTAINER_WIDTH) * actualContainerWidth;
+    const displayY = (standardY / STANDARD_CONTAINER_HEIGHT) * actualContainerHeight;
+    return { x: displayX, y: displayY };
+}
+
 let LOCATION_NAMES = [];
 let LOCATION_DATA = []; // Store full location objects with numbers/identifiers
 let ZONE_NAME = 'Unknown'; // Store the zone name for export
@@ -466,67 +504,50 @@ function setupMapClickListener() {
     // Attach click listener directly to the actual image element
     if (actualImg) {
         actualImg.addEventListener('click', function(e) {
-            // The actual img element's bounds
             // Get the container bounds (same as used in display)
             const containerRect = mapImage.getBoundingClientRect();
+            // Get the actual image bounds (centered within container due to flex)
+            const imgRect = actualImg.getBoundingClientRect();
             
-            console.log(`🖱️ IMG DETAILS: naturalWidth=${this.naturalWidth}, naturalHeight=${this.naturalHeight}, containerWidth=${containerRect.width}, containerHeight=${containerRect.height}`);
-            console.log(`🖱️ VIEWPORT CLICK: clientX=${e.clientX}, clientY=${e.clientY}`);
-            console.log(`🖱️ CONTAINER BOUNDS: left=${containerRect.left}, top=${containerRect.top}, width=${containerRect.width}, height=${containerRect.height}`);
+            console.log(`🖱️ CONTAINER: ${containerRect.width}x${containerRect.height}`);
+            console.log(`🖱️ IMAGE: ${imgRect.width}x${imgRect.height}, offsetX=${imgRect.left - containerRect.left}`);
 
-            // Get pixel coordinates relative to the container
-            const pixelX = e.clientX - containerRect.left;
-            const pixelY = e.clientY - containerRect.top;
+            // Get pixel coordinates relative to the IMAGE, not the container
+            const pixelX = e.clientX - imgRect.left;
+            const pixelY = e.clientY - imgRect.top;
 
-            // Get image natural/displayed dimensions
-            const imgNaturalWidth = this.naturalWidth;
-            const imgNaturalHeight = this.naturalHeight;
-            
-            // Scale from container coordinates to natural image coordinates
-            const x = Math.round((pixelX / containerRect.width) * imgNaturalWidth);
-            const y = Math.round((pixelY / containerRect.height) * imgNaturalHeight);
+            // Convert to STANDARD coordinates using IMAGE dimensions (not container)
+            const standardCoords = convertClickToStandardCoordinates(pixelX, pixelY, imgRect.width, imgRect.height);
 
-            console.log(`🖱️ CLICK DETAILS: container=${containerRect.width}x${containerRect.height}, natural=${imgNaturalWidth}x${imgNaturalHeight}, clickPixelInContainer=(${pixelX},${pixelY}), storedCoord=(${x},${y})`);
+            console.log(`🖱️ CLICK: image pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), standard coord=(${standardCoords.x},${standardCoords.y})`);
 
             if (builderMode === 'locations') {
-                placePin(x, y);
+                placePin(standardCoords.x, standardCoords.y);
             } else {
-                placeButton(x, y);
+                placeButton(standardCoords.x, standardCoords.y);
             }
         });
     } else {
         // Fallback: attach to map-image container if img not found
         mapImage.addEventListener('click', function(e) {
-            // Use the container for coordinate calculation (same as main handler)
+            // Use the container for coordinate calculation
             const containerRect = mapImage.getBoundingClientRect();
-            const wrapperRect = mapImage.parentElement.getBoundingClientRect();
 
-            console.log(`🖱️ FALLBACK HANDLER: clicking on container`);
+            console.log(`🖱️ FALLBACK: using container`);
 
             // Get pixel coordinates relative to the container
             const pixelX = e.clientX - containerRect.left;
             const pixelY = e.clientY - containerRect.top;
 
-            // Get image natural/displayed dimensions from actual img element
-            let imgNaturalWidth = actualImg?.naturalWidth;
-            let imgNaturalHeight = actualImg?.naturalHeight;
-            
-            if (!imgNaturalWidth || !imgNaturalHeight) {
-                // Fallback to container dimensions if natural not available
-                imgNaturalWidth = containerRect.width;
-                imgNaturalHeight = containerRect.height;
-            }
+            // Convert to STANDARD coordinates
+            const standardCoords = convertClickToStandardCoordinates(pixelX, pixelY, containerRect.width, containerRect.height);
 
-            // Scale from container coordinates to natural image coordinates
-            const x = Math.round((pixelX / containerRect.width) * imgNaturalWidth);
-            const y = Math.round((pixelY / containerRect.height) * imgNaturalHeight);
-
-            console.log(`🖱️ FALLBACK CLICK: container=${containerRect.width}x${containerRect.height}, natural=${imgNaturalWidth}x${imgNaturalHeight}, clickPixel=(${pixelX},${pixelY}), storedCoord=(${x},${y})`);
+            console.log(`🖱️ FALLBACK CLICK: container pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), standard coord=(${standardCoords.x},${standardCoords.y})`);
 
             if (builderMode === 'locations') {
-                placePin(x, y);
+                placePin(standardCoords.x, standardCoords.y);
             } else {
-                placeButton(x, y);
+                placeButton(standardCoords.x, standardCoords.y);
             }
         });
     }
@@ -792,29 +813,27 @@ function createVisualPin(x, y, locationNum) {
         return;
     }
 
-    // Get the container bounds (same as map-utils.js does)
-    const imgRect = mapImage.getBoundingClientRect();
-    const wrapperRect = mapImage.parentElement.getBoundingClientRect();
+    // actualImg was already determined above, use it to get image dimensions
+    if (!actualImg) {
+        console.error('Could not find actual image element');
+        return;
+    }
     
-    // Get natural dimensions from the actual img element
-    const imgNaturalWidth = actualImg?.naturalWidth || imgRect.width;
-    const imgNaturalHeight = actualImg?.naturalHeight || imgRect.height;
-
-    // Convert natural image coordinates to displayed pixel coordinates
-    // Using the CONTAINER width/height (not the actual image width/height)
-    // This matches map-utils.js approach
-    const pixelX = (x / imgNaturalWidth) * imgRect.width;
-    const pixelY = (y / imgNaturalHeight) * imgRect.height;
-
-    // Calculate offset of container within wrapper
-    const offsetX = imgRect.left - wrapperRect.left;
-    const offsetY = imgRect.top - wrapperRect.top;
+    const imgRect = actualImg.getBoundingClientRect();
+    const containerRect = mapImage.getBoundingClientRect();
     
-    // Position the pin using the same formula as map-utils.js
-    const pinLeft = offsetX + pixelX - 15;
-    const pinTop = offsetY + pixelY - 15;
+    // Convert from STANDARD coordinates to display coordinates using ACTUAL IMAGE dimensions
+    // (must match the dimensions used when click was converted)
+    const displayCoords = convertStandardToDisplayCoordinates(x, y, imgRect.width, imgRect.height);
     
-    console.log(`Pin calc (matching map-utils): container_offset=(${offsetX},${offsetY}), pixel_in_container=(${pixelX.toFixed(1)},${pixelY.toFixed(1)}), final=(${pinLeft.toFixed(1)},${pinTop.toFixed(1)})`);
+    // Position relative to the container, accounting for image offset within container
+    const imgOffsetX = imgRect.left - containerRect.left;
+    const imgOffsetY = imgRect.top - containerRect.top;
+    
+    const pinLeft = displayCoords.x + imgOffsetX - 15;
+    const pinTop = displayCoords.y + imgOffsetY - 15;
+    
+    console.log(`Pin display: standard=(${x},${y}), image=${imgRect.width.toFixed(0)}x${imgRect.height.toFixed(0)}, display=(${displayCoords.x.toFixed(1)},${displayCoords.y.toFixed(1)}), offset=(${imgOffsetX.toFixed(0)},${imgOffsetY.toFixed(0)}), pinPos=(${pinLeft.toFixed(1)},${pinTop.toFixed(1)})`);
 
     // Create pin element
     const pin = document.createElement('div');
