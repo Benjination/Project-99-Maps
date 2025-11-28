@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everfrost Peaks - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">Antonica - Everfrost Peaks</p>
+        </header>
+
+        <nav class="location-nav">
+            <a href="../HTML/index.html" class="nav-link">Home</a>
+            <span class="nav-separator">/</span>
+            <a href="../HTML/index.html" class="nav-link">Antonica</a>
+            <span class="nav-separator">/</span>
+            <span class="nav-current">Everfrost Peaks</span>
+        </nav>
+
+        <nav class="adjacent-zones">
+            <a href="bear-caves.html" class="adjacent-button">Bear Caves →</a>
+            <a href="halas.html" class="adjacent-button">← Halas</a>
+            <a href="permafrost-keep.html" class="adjacent-button">Permafrost Keep →</a>
+        </nav>
+
+        <div class="map-container">
+            <div class="map-viewer">
+                <div class="map-image-wrapper">
+                    <img id="zone-map" src="../../Images/Antonica/Everfrost.png" alt="Everfrost Peaks Map" class="map-image">
+                    <div id="map-overlay" class="map-overlay"></div>
+                </div>
+                <div class="map-info">
+                    <h2>Locations</h2>
+                    <div id="locations-list" class="locations-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../../Function/zone-init.js"></script>
+    <script src="../../Function/page-check.js"></script>
+</body>
+</html>
