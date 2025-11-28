@@ -18,3 +18,4 @@ export const zoneData = {
         { name: 'Qeynos', link: '../AntonicaHTML/qeynos-s.html', x: 857, y: 331 },
     ]
 };
+    
