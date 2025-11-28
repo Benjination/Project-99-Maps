@@ -30,13 +30,13 @@ function getViewportSize() {
 }
 
 function convertViewportToDisplayCoordinates(viewportX, viewportY) {
-    // Simple approach: Convert from our fixed coordinate space to actual viewer pixels
+    // UNIVERSAL SYSTEM: Only works with .map-image-wrapper structure
+    // All pages MUST use this structure for consistent coordinate system
     
-    // Find the viewer wrapper to get its actual dimensions
-    const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+    const mapWrapper = document.querySelector('.map-image-wrapper');
     
     if (!mapWrapper) {
-        console.warn('Could not find map wrapper for display conversion');
+        console.error('CRITICAL: .map-image-wrapper not found! All pages must use universal structure.');
         return { x: viewportX, y: viewportY };
     }
     
@@ -107,30 +107,25 @@ export function renderLocationsList(locations) {
  * @param {Array} buttons - Array of button objects with name, link, x, y
  */
 export function renderMapButtons(buttons) {
-    const overlay = document.getElementById('map-overlay');
-    const mapImage = document.getElementById('map-image') || document.getElementById('paineel-map') || document.getElementById('paineel-2-map');
-    const wrapper = mapImage?.parentElement;
+    // UNIVERSAL SYSTEM: Only works with .map-image-wrapper structure
+    const overlay = document.getElementById('map-overlay') || document.querySelector('.map-overlay');
     
-    if (!overlay || !mapImage || !wrapper || !buttons) return;
+    if (!overlay || !buttons) {
+        console.warn('Could not find overlay or buttons for rendering');
+        return;
+    }
     
     buttons.forEach(button => {
-        // Get the actual displayed dimensions of the image
-        const imgRect = mapImage.getBoundingClientRect();
-        const viewportRect = mapImage.parentElement.getBoundingClientRect();
-        
-        // Convert viewport coordinates to display pixels
+        // Convert viewport coordinates to display pixels using universal system
         const displayCoords = convertViewportToDisplayCoordinates(button.x, button.y);
         
-        const imgOffsetX = imgRect.left - viewportRect.left;
-        const imgOffsetY = imgRect.top - viewportRect.top;
-
         // Create a button element
         const buttonEl = document.createElement('button');
         buttonEl.className = 'map-button';
         buttonEl.textContent = button.name;
         buttonEl.style.position = 'absolute';
-        buttonEl.style.left = (imgOffsetX + displayCoords.x - 50) + 'px';
-        buttonEl.style.top = (imgOffsetY + displayCoords.y - 15) + 'px';
+        buttonEl.style.left = (displayCoords.x - 50) + 'px';
+        buttonEl.style.top = (displayCoords.y - 15) + 'px';
         buttonEl.style.width = '100px';
         buttonEl.style.height = '30px';
         buttonEl.style.padding = '5px';
@@ -247,10 +242,10 @@ export function highlightLocationInstances(locationNumber, locations) {
         marker.style.width = '30px';
         marker.style.height = '30px';
         marker.style.borderRadius = '50%';
-        marker.style.border = '3px solid #ffd700';
-        marker.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
+        marker.style.border = '3px solid #ff0000';
+        marker.style.backgroundColor = 'rgba(255, 0, 0, 0.2)';
         marker.style.zIndex = '10';
-        marker.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+        marker.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
         marker.style.pointerEvents = 'none';
         
         overlay.appendChild(marker);

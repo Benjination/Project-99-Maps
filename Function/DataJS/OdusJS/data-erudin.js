@@ -5,22 +5,22 @@ export const zoneData = {
     mapImage: '../../Images/Odus/Erudin.png',
     // NOTE: Coordinates have been updated to the new universal viewport system (0-1200, 0-900)
     // If locations appear incorrect, use builder mode (?builder=true) to re-place pins
-    locations: [
-        { number: 1, name: 'Temple of Divine Light', x: 626, y: 525 },
-        { number: 2, name: 'Teleporter to Erudin Palace', x: 548, y: 501 },
-        { number: 3, name: 'Bard', x: 507, y: 514 },
-        { number: 4, name: 'Teleporter to Erudin Docks', x: 473, y: 531 },
-        { number: 5, name: 'City Armory', x: 465, y: 571 },
-        { number: 6, name: 'Arrival Platform', x: 536, y: 624 },
-        { number: 7, name: 'Erudin Surplus', x: 595, y: 807 },
-        { number: 8, name: 'Erudin City Library', x: 500, y: 917 },
-        { number: 9, name: 'Deepwater Knights', x: 377, y: 929 },
-        { number: 10, name: 'Vasty Deep Inn', x: 632, y: 1002 },
-        { number: 11, name: 'BlueHawk\'s Food', x: 428, y: 1032 }
+     locations: [
+        { number: 1, name: 'Temple of Divine Light', x: 451, y: 116 },
+        { number: 2, name: 'Teleporter to Erudin Palace', x: 544, y: 93 },
+        { number: 3, name: 'Bard', x: 591, y: 101 },
+        { number: 4, name: 'Teleporter to Erudin Docks', x: 636, y: 120 },
+        { number: 5, name: 'City Armory', x: 644, y: 160 },
+        { number: 6, name: 'Arrival Platform', x: 557, y: 202 },
+        { number: 7, name: 'Erudin Surplus', x: 487, y: 367 },
+        { number: 8, name: 'Erudin City Library', x: 599, y: 465 },
+        { number: 9, name: 'Deepwater Knights', x: 746, y: 477 },
+        { number: 10, name: 'Vasty Deep Inn', x: 441, y: 542 },
+        { number: 11, name: 'BlueHawk\'s Food', x: 689, y: 566 },
     ],
     buttons: [
-        { name: 'The Docks', link: 'erudin-docks.html', x: 415, y: 509 },
-        { name: 'Erudin Palace', link: 'erudin-palace.html', x: 556, y: 456 },
-        { name: 'Toxxulia Forest', link: 'toxulia-forest.html', x: 542, y: 1364 }
+        { name: 'Toxxulia Forest', link: 'toxulia-forest.html', x: 644, y: 877 },
+        { name: 'Erudin Docks', link: 'erudin-docks.html', x: 700, y: 95 },
+        { name: 'Erudin Palace', link: 'erudin-palace.html', x: 496, y: 55 },
     ]
 };

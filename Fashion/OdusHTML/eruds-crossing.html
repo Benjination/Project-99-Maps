@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Erud's Crossing - Project 1999 Maps</title>
     <link rel="stylesheet" href="../../Function/CSS/maps.css">
-    <link rel="stylesheet" href="../../Function/CSS/zone.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
 </head>
 <body>
     <div class="container">
@@ -27,13 +27,16 @@
         </nav>
 
         <div class="map-container">
-            <div class="map-wrapper">
-                <div id="map-image" class="map-image">
-                    <img id="zone-map" src="../../Images/Odus/ErudsCrossing.png" alt="Erud's Crossing Map">
-                    <div id="map-overlay"></div>
+            <div class="map-viewer">
+                <div class="map-image-wrapper">
+                    <img id="eruds-crossing-map" src="../../Images/Odus/Erud's Crossing.png" alt="Erud's Crossing Map" class="map-image">
+                    <div id="map-overlay" class="map-overlay"></div>
+                </div>
+                <div class="map-info">
+                    <h2>Locations</h2>
+                    <div id="locations-list" class="locations-list"></div>
                 </div>
             </div>
-            <div id="locations-list" class="locations-list"></div>
         </div>
     </div>
 

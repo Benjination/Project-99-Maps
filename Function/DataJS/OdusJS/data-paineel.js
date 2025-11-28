@@ -23,7 +23,7 @@ export const zoneData = {
         { number: 17, name: 'Observatory', x: 895, y: 820 }
     ],
     buttons: [
-        { name: 'Toxxulia Forrest', link: 'toxxulia-forrest.html', x: 962, y: 449 },
+        { name: 'Toxxulia Forrest', link: 'toxulia-forest.html', x: 962, y: 449 },
         { name: 'Paineel-2', link: 'paineel-2.html', x: 1004, y: 584 }
     ]
 };

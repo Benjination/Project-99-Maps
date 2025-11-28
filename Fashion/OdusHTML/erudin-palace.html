@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erudin Palace - Project 1999 Maps</title>
+    <title>Erudin Palace - Level 1 - Project 1999 Maps</title>
     <link rel="stylesheet" href="../../Function/CSS/maps.css">
-    <link rel="stylesheet" href="../../Function/CSS/zone.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Project 1999 Maps</h1>
-            <p class="subtitle">Odus - Erudin Palace</p>
+            <p class="subtitle">Odus - Erudin Palace - Level 1</p>
         </header>
 
         <nav class="location-nav">
@@ -19,22 +19,26 @@
             <span class="nav-separator">/</span>
             <a href="../HTML/index.html" class="nav-link">Odus</a>
             <span class="nav-separator">/</span>
-            <span class="nav-current">Erudin Palace</span>
+            <span class="nav-current">Erudin Palace - Level 1</span>
         </nav>
 
         <nav class="adjacent-zones">
             <a href="erudin.html" class="adjacent-button">← Erudin</a>
+            <a href="erudin-palace-basement.html" class="adjacent-button">Basement</a>
+            <a href="erudin-palace-level-2.html" class="adjacent-button">Level 2 →</a>
         </nav>
 
         <div class="map-container">
-            <div class="map-wrapper">
-                <div id="map-image" class="map-image dual-level">
-                    <img id="zone-map" src="../../Images/Odus/ErudinPalace.png" alt="Erudin Palace Map - Level 1">
-                    <img id="zone-map-lvl2" src="../../Images/Odus/erudinPalaceLvl2.png" alt="Erudin Palace Map - Level 2">
-                    <div id="map-overlay"></div>
+            <div class="map-viewer">
+                <div class="map-image-wrapper">
+                    <img id="zone-map" src="../../Images/Odus/ErudinPalaceLevel1.png" alt="Erudin Palace - Level 1 Map" class="map-image">
+                    <div id="map-overlay" class="map-overlay"></div>
+                </div>
+                <div class="map-info">
+                    <h2>Locations</h2>
+                    <div id="locations-list" class="locations-list"></div>
                 </div>
             </div>
-            <div id="locations-list" class="locations-list"></div>
         </div>
     </div>
 

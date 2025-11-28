@@ -211,14 +211,13 @@ function getViewportSize() {
 }
 
 function convertClickToViewportCoordinates(viewportPixelX, viewportPixelY) {
-    // Simple approach: The viewer has fixed dimensions, clicks map directly to coordinate space
-    // We scale the click position relative to the actual viewer size to our fixed 1200×900 reference
+    // UNIVERSAL SYSTEM: Only works with .map-image-wrapper structure
+    // All pages MUST use this structure for consistent coordinate system
     
-    // Find the viewer wrapper to get its actual dimensions
-    const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+    const mapWrapper = document.querySelector('.map-image-wrapper');
     
     if (!mapWrapper) {
-        console.warn('Could not find map wrapper for coordinate conversion');
+        console.error('CRITICAL: .map-image-wrapper not found! All pages must use universal structure.');
         return { x: Math.round(viewportPixelX), y: Math.round(viewportPixelY) };
     }
     
@@ -237,13 +236,13 @@ function convertClickToViewportCoordinates(viewportPixelX, viewportPixelY) {
 }
 
 function convertViewportToDisplayCoordinates(viewportX, viewportY) {
-    // Simple approach: Convert from our fixed coordinate space to actual viewer pixels
+    // UNIVERSAL SYSTEM: Only works with .map-image-wrapper structure
+    // All pages MUST use this structure for consistent coordinate system
     
-    // Find the viewer wrapper to get its actual dimensions
-    const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+    const mapWrapper = document.querySelector('.map-image-wrapper');
     
     if (!mapWrapper) {
-        console.warn('Could not find map wrapper for display conversion');
+        console.error('CRITICAL: .map-image-wrapper not found! All pages must use universal structure.');
         return { x: viewportX, y: viewportY };
     }
     
@@ -525,77 +524,36 @@ function setupBuilderUI(zoneId) {
 }
 
 function setupMapClickListener() {
-    // Handle both standard and custom map image IDs
-    let mapImage = document.getElementById('map-image');
-    let mapContainer = document.getElementById('map-overlay');
-    
-    // For Paineel and other custom maps
-    if (!mapImage) {
-        mapImage = document.getElementById('paineel-map');
-    }
-    if (!mapImage) {
-        mapImage = document.getElementById('paineel-2-map');
-    }
-    
-    // For custom overlay containers
-    if (!mapContainer) {
-        mapContainer = document.querySelector('.map-overlay');
-    }
+    // UNIVERSAL SYSTEM: Only works with .map-image-wrapper structure
+    const mapWrapper = document.querySelector('.map-image-wrapper');
+    const overlay = document.getElementById('map-overlay') || document.querySelector('.map-overlay');
 
-    // If mapImage is a container div, find the actual img element inside it
-    let actualImg = mapImage;
-    if (mapImage && mapImage.tagName !== 'IMG') {
-        actualImg = mapImage.querySelector('img');
-    }
-
-    if (!mapImage || !mapContainer) {
-        console.error('Map elements not found. Map ID:', mapImage?.id, 'Overlay ID:', mapContainer?.id);
+    if (!mapWrapper || !overlay) {
+        console.error('CRITICAL: Universal structure not found! Need .map-image-wrapper and .map-overlay');
         return;
     }
 
-    console.log('Map click listener setup on:', mapImage.id, 'Actual image:', actualImg?.id || actualImg?.tagName);
+    console.log('Universal map click listener setup on .map-image-wrapper');
 
-    // Attach click listener directly to the actual image element
-    if (actualImg) {
-        actualImg.addEventListener('click', function(e) {
-            // Find the wrapper element for proper coordinate reference
-            const mapWrapper = actualImg.closest('.map-image-wrapper') || actualImg.parentElement;
-            const wrapperRect = mapWrapper.getBoundingClientRect();
-            
-            // Get pixel coordinates relative to the wrapper
-            const pixelX = e.clientX - wrapperRect.left;
-            const pixelY = e.clientY - wrapperRect.top;
+    // Attach click listener to the wrapper element
+    mapWrapper.addEventListener('click', function(e) {
+        const wrapperRect = mapWrapper.getBoundingClientRect();
+        
+        // Get pixel coordinates relative to the wrapper
+        const pixelX = e.clientX - wrapperRect.left;
+        const pixelY = e.clientY - wrapperRect.top;
 
-            // Convert to viewport coordinates
-            const viewportCoords = convertClickToViewportCoordinates(pixelX, pixelY);
+        // Convert to viewport coordinates using universal system
+        const viewportCoords = convertClickToViewportCoordinates(pixelX, pixelY);
 
-            console.log(`🖱️ CLICK: wrapper pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), viewport coord=(${viewportCoords.x},${viewportCoords.y})`);
+        console.log(`🖱️ UNIVERSAL CLICK: wrapper pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), viewport coord=(${viewportCoords.x},${viewportCoords.y})`);
 
-            if (builderMode === 'locations') {
-                placePin(viewportCoords.x, viewportCoords.y);
-            } else {
-                placeButton(viewportCoords.x, viewportCoords.y);
-            }
-        });
-    } else {
-        // Fallback: attach to map-image container if img not found
-        mapImage.addEventListener('click', function(e) {
-            const mapWrapper = mapImage.closest('.map-image-wrapper') || mapImage.parentElement;
-            const wrapperRect = mapWrapper.getBoundingClientRect();
-            const pixelX = e.clientX - wrapperRect.left;
-            const pixelY = e.clientY - wrapperRect.top;
-
-            const viewportCoords = convertClickToViewportCoordinates(pixelX, pixelY);
-
-            console.log(`🖱️ FALLBACK CLICK: wrapper pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), viewport coord=(${viewportCoords.x},${viewportCoords.y})`);
-
-            if (builderMode === 'locations') {
-                placePin(viewportCoords.x, viewportCoords.y);
-            } else {
-                placeButton(viewportCoords.x, viewportCoords.y);
-            }
-        });
-    }
+        if (builderMode === 'locations') {
+            placePin(viewportCoords.x, viewportCoords.y);
+        } else {
+            placeButton(viewportCoords.x, viewportCoords.y);
+        }
+    });
 }
 
 function updateButtonsList() {
@@ -748,8 +706,8 @@ function makeButtonDraggable(marker, buttonId) {
     document.addEventListener('mousemove', function(e) {
         if (!isDragging) return;
 
-        // NEW: Simple wrapper-based drag positioning
-        const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+        // UNIVERSAL SYSTEM: Only use .map-image-wrapper
+        const mapWrapper = document.querySelector('.map-image-wrapper');
         if (!mapWrapper) return;
         
         const wrapperRect = mapWrapper.getBoundingClientRect();
@@ -770,8 +728,8 @@ function makeButtonDraggable(marker, buttonId) {
         isDragging = false;
         marker.style.zIndex = '14';
 
-        // NEW: Simple wrapper-based coordinate capture
-        const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+        // UNIVERSAL SYSTEM: Only use .map-image-wrapper
+        const mapWrapper = document.querySelector('.map-image-wrapper');
         if (!mapWrapper) return;
         
         const wrapperRect = mapWrapper.getBoundingClientRect();
