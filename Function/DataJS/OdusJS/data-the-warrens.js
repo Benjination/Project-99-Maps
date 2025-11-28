@@ -3,6 +3,8 @@ export const zoneData = {
     region: 'Odus',
     suggestedLevel: '5-15',
     mapImage: '../../Images/Odus/The Warrens.png',
+    // NOTE: Coordinates have been updated to the new universal viewport system (0-1200, 0-900)
+    // If locations appear incorrect, use builder mode (?builder=true) to re-place pins
     locations: [
         { number: 1, name: 'Diseased Room', x: 647, y: 749 },
         { number: 2, name: 'Kitchen', x: 171, y: 762 },

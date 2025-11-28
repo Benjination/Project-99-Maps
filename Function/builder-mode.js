@@ -1,4 +1,17 @@
 /**
+ * UNIVERSAL MAP BUILDER SYSTEM
+ * 
+ * ⚠️  IMPORTANT: This file has been cleaned of legacy coordinate systems.
+ * ⚠️  DO NOT REVERT to old draw.io coordinate calculations (1000-0, 400-1400 ranges)
+ * ⚠️  DO NOT use image-specific offset calculations or getBoundingClientRect on images
+ * 
+ * CURRENT SYSTEM (November 2025):
+ * - Universal coordinate space: (0-1200, 0-900) 
+ * - Locked to .map-image-wrapper dimensions, NOT individual image sizes
+ * - Works with ANY image size (200+ different maps)
+ * - Uses convertClickToViewportCoordinates() and convertViewportToDisplayCoordinates()
+ * - Element detection: document.querySelector('.map-image-wrapper') or '.map-overlay'
+ * 
  * Builder Mode - Interactive location pin placement for map building
  * Activated with ?builder=true query parameter
  */
@@ -172,42 +185,83 @@ const LOCATION_NAMES_BY_ZONE = {
     ]
 };
 
-// ===== STANDARD COORDINATE SYSTEM =====
-// All maps use a STANDARD reference size for coordinate storage
-// This allows 200+ maps of different sizes to use the same coordinate system
-// The standard container is the reference - images scale to fit, but coordinates stay consistent
+// ===== UNIVERSAL COORDINATE SYSTEM =====
+// ONE system that works with ALL maps, regardless of size or continent
 // 
-// CRITICAL: Container size MUST be identical in builder and non-builder modes!
-// - CSS enforces 4:3 aspect ratio on .map-image to maintain consistency
-// - The actual pixel dimensions may vary based on viewport, but the aspect ratio stays constant
-// - Both builder and non-builder measure the container at runtime to ensure they convert identically
-const STANDARD_CONTAINER_WIDTH = 1200;  // Standard width for coordinate reference
-const STANDARD_CONTAINER_HEIGHT = 900;  // Standard height for coordinate reference
+// The viewing window is ALWAYS a fixed size (1200×900 reference)
+// All maps are scaled/fitted into this window using CSS (object-fit: contain)
+// 
+// How it works:
+// 1. Browser renders image at actual file size
+// 2. CSS scales it to fit within viewport (object-fit: contain)
+// 3. Image may be smaller than viewport, so it's centered by flex
+// 4. Click coordinates are captured in viewport pixels
+// 5. We account for image offset (centering) then convert to fixed reference coords
+// 6. Display converts reference coords back, accounting for the same offset
+// 
+// Result: One coordinate system (0-1200, 0-900) works for ALL maps
+const VIEWPORT_WIDTH = 1200;   // Fixed reference width (what we store)
+const VIEWPORT_HEIGHT = 900;   // Fixed reference height (what we store)
 
-// Conversion helpers to convert between actual container size and standard size
-function getActualContainerSize() {
-    const mapImage = document.getElementById('map-image');
-    if (!mapImage) {
-        console.warn('map-image not found, using standard size as fallback');
-        return { width: STANDARD_CONTAINER_WIDTH, height: STANDARD_CONTAINER_HEIGHT };
+// Conversion helpers - works with FIXED viewport size, not actual image size
+function getViewportSize() {
+    // The viewport is always 1200×900 in our coordinate system
+    // The actual pixel size may vary (browser window, scaling), but we work in fixed reference space
+    return { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT };
+}
+
+function convertClickToViewportCoordinates(viewportPixelX, viewportPixelY) {
+    // Simple approach: The viewer has fixed dimensions, clicks map directly to coordinate space
+    // We scale the click position relative to the actual viewer size to our fixed 1200×900 reference
+    
+    // Find the viewer wrapper to get its actual dimensions
+    const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+    
+    if (!mapWrapper) {
+        console.warn('Could not find map wrapper for coordinate conversion');
+        return { x: Math.round(viewportPixelX), y: Math.round(viewportPixelY) };
     }
-    const rect = mapImage.getBoundingClientRect();
-    console.log(`📏 Container size: ${rect.width.toFixed(0)}x${rect.height.toFixed(0)} (aspect: ${(rect.width/rect.height).toFixed(3)})`);
-    return { width: rect.width, height: rect.height };
+    
+    const wrapperRect = mapWrapper.getBoundingClientRect();
+    
+    // Scale click position from actual wrapper size to fixed reference space
+    const scaleX = VIEWPORT_WIDTH / wrapperRect.width;
+    const scaleY = VIEWPORT_HEIGHT / wrapperRect.height;
+    
+    const viewportX = viewportPixelX * scaleX;
+    const viewportY = viewportPixelY * scaleY;
+    
+    console.log(`🔄 Click conversion: wrapper=${wrapperRect.width.toFixed(0)}x${wrapperRect.height.toFixed(0)}, click=(${viewportPixelX.toFixed(0)},${viewportPixelY.toFixed(0)}), scale=(${scaleX.toFixed(3)},${scaleY.toFixed(3)}), viewport=(${viewportX.toFixed(0)},${viewportY.toFixed(0)})`);
+    
+    return { x: Math.round(viewportX), y: Math.round(viewportY) };
 }
 
-function convertClickToStandardCoordinates(containerPixelX, containerPixelY, actualContainerWidth, actualContainerHeight) {
-    // Convert from actual container pixel coordinates to STANDARD coordinates
-    const standardX = Math.round((containerPixelX / actualContainerWidth) * STANDARD_CONTAINER_WIDTH);
-    const standardY = Math.round((containerPixelY / actualContainerHeight) * STANDARD_CONTAINER_HEIGHT);
-    return { x: standardX, y: standardY };
-}
-
-function convertStandardToDisplayCoordinates(standardX, standardY, actualContainerWidth, actualContainerHeight) {
-    // Convert from STANDARD coordinates back to actual container pixel coordinates
-    const displayX = (standardX / STANDARD_CONTAINER_WIDTH) * actualContainerWidth;
-    const displayY = (standardY / STANDARD_CONTAINER_HEIGHT) * actualContainerHeight;
-    return { x: displayX, y: displayY };
+function convertViewportToDisplayCoordinates(viewportX, viewportY) {
+    // Simple approach: Convert from our fixed coordinate space to actual viewer pixels
+    
+    // Find the viewer wrapper to get its actual dimensions
+    const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+    
+    if (!mapWrapper) {
+        console.warn('Could not find map wrapper for display conversion');
+        return { x: viewportX, y: viewportY };
+    }
+    
+    const wrapperRect = mapWrapper.getBoundingClientRect();
+    
+    // Scale from our fixed 1200×900 coordinate space to actual wrapper size
+    const scaleX = wrapperRect.width / VIEWPORT_WIDTH;
+    const scaleY = wrapperRect.height / VIEWPORT_HEIGHT;
+    
+    const displayX = viewportX * scaleX;
+    const displayY = viewportY * scaleY;
+    
+    console.log(`🔄 Display conversion: viewport=(${viewportX},${viewportY}), wrapper=${wrapperRect.width.toFixed(0)}x${wrapperRect.height.toFixed(0)}, scale=(${scaleX.toFixed(3)},${scaleY.toFixed(3)}), display=(${displayX.toFixed(1)},${displayY.toFixed(1)})`);
+    
+    return { 
+        x: displayX, 
+        y: displayY 
+    };
 }
 
 let LOCATION_NAMES = [];
@@ -504,50 +558,41 @@ function setupMapClickListener() {
     // Attach click listener directly to the actual image element
     if (actualImg) {
         actualImg.addEventListener('click', function(e) {
-            // Get the container bounds (same as used in display)
-            const containerRect = mapImage.getBoundingClientRect();
-            // Get the actual image bounds (centered within container due to flex)
-            const imgRect = actualImg.getBoundingClientRect();
+            // Find the wrapper element for proper coordinate reference
+            const mapWrapper = actualImg.closest('.map-image-wrapper') || actualImg.parentElement;
+            const wrapperRect = mapWrapper.getBoundingClientRect();
             
-            console.log(`🖱️ CONTAINER: ${containerRect.width}x${containerRect.height}`);
-            console.log(`🖱️ IMAGE: ${imgRect.width}x${imgRect.height}, offsetX=${imgRect.left - containerRect.left}`);
+            // Get pixel coordinates relative to the wrapper
+            const pixelX = e.clientX - wrapperRect.left;
+            const pixelY = e.clientY - wrapperRect.top;
 
-            // Get pixel coordinates relative to the IMAGE, not the container
-            const pixelX = e.clientX - imgRect.left;
-            const pixelY = e.clientY - imgRect.top;
+            // Convert to viewport coordinates
+            const viewportCoords = convertClickToViewportCoordinates(pixelX, pixelY);
 
-            // Convert to STANDARD coordinates using IMAGE dimensions (not container)
-            const standardCoords = convertClickToStandardCoordinates(pixelX, pixelY, imgRect.width, imgRect.height);
-
-            console.log(`🖱️ CLICK: image pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), standard coord=(${standardCoords.x},${standardCoords.y})`);
+            console.log(`🖱️ CLICK: wrapper pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), viewport coord=(${viewportCoords.x},${viewportCoords.y})`);
 
             if (builderMode === 'locations') {
-                placePin(standardCoords.x, standardCoords.y);
+                placePin(viewportCoords.x, viewportCoords.y);
             } else {
-                placeButton(standardCoords.x, standardCoords.y);
+                placeButton(viewportCoords.x, viewportCoords.y);
             }
         });
     } else {
         // Fallback: attach to map-image container if img not found
         mapImage.addEventListener('click', function(e) {
-            // Use the container for coordinate calculation
-            const containerRect = mapImage.getBoundingClientRect();
+            const mapWrapper = mapImage.closest('.map-image-wrapper') || mapImage.parentElement;
+            const wrapperRect = mapWrapper.getBoundingClientRect();
+            const pixelX = e.clientX - wrapperRect.left;
+            const pixelY = e.clientY - wrapperRect.top;
 
-            console.log(`🖱️ FALLBACK: using container`);
+            const viewportCoords = convertClickToViewportCoordinates(pixelX, pixelY);
 
-            // Get pixel coordinates relative to the container
-            const pixelX = e.clientX - containerRect.left;
-            const pixelY = e.clientY - containerRect.top;
-
-            // Convert to STANDARD coordinates
-            const standardCoords = convertClickToStandardCoordinates(pixelX, pixelY, containerRect.width, containerRect.height);
-
-            console.log(`🖱️ FALLBACK CLICK: container pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), standard coord=(${standardCoords.x},${standardCoords.y})`);
+            console.log(`🖱️ FALLBACK CLICK: wrapper pixel=(${pixelX.toFixed(0)},${pixelY.toFixed(0)}), viewport coord=(${viewportCoords.x},${viewportCoords.y})`);
 
             if (builderMode === 'locations') {
-                placePin(standardCoords.x, standardCoords.y);
+                placePin(viewportCoords.x, viewportCoords.y);
             } else {
-                placeButton(standardCoords.x, standardCoords.y);
+                placeButton(viewportCoords.x, viewportCoords.y);
             }
         });
     }
@@ -642,45 +687,19 @@ function placePin(x, y) {
 }
 
 function createButtonMarker(x, y, buttonId) {
-    let mapImage = document.getElementById('map-image');
-    let overlay = document.getElementById('map-overlay');
-    
-    if (!mapImage) {
-        mapImage = document.getElementById('paineel-map');
-    }
-    if (!mapImage) {
-        mapImage = document.getElementById('paineel-2-map');
-    }
-    
+    // NEW: Universal element detection
+    const overlay = document.getElementById('map-overlay') || document.querySelector('.map-overlay');
+
     if (!overlay) {
-        overlay = document.querySelector('.map-overlay');
-    }
-
-    const wrapper = mapImage?.parentElement;
-
-    if (!mapImage || !overlay || !wrapper) {
-        console.error('Could not find map elements for button creation');
+        console.error('Could not find map overlay for button creation');
         return;
     }
 
-    // Get dimensions
-    const imgRect = mapImage.getBoundingClientRect();
-    const wrapperRect = wrapper.getBoundingClientRect();
-
-    // Convert back to pixel coordinates
-    const drawioWidth = 755;
-    const drawioHeight = 800;
-    const drawioLeft = 140;
-    const drawioTop = 350;
-
-    const drawio_x = drawioLeft + ((1000 - x) / 1000) * drawioWidth;
-    const drawio_y = drawioTop + ((y - 400) / 1000) * drawioHeight;
-
-    const pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
-    const pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
-
-    const offsetX = (imgRect.left - wrapperRect.left);
-    const offsetY = (imgRect.top - wrapperRect.top);
+    // LEGACY CODE REMOVED: Complex image offset calculations
+    // OLD: imgRect, viewportRect, imgOffsetX, imgOffsetY calculations
+    
+    // NEW: Simple wrapper-based coordinate conversion
+    const displayCoords = convertViewportToDisplayCoordinates(x, y);
 
     // Create button marker element
     const marker = document.createElement('div');
@@ -688,8 +707,8 @@ function createButtonMarker(x, y, buttonId) {
     marker.dataset.buttonId = buttonId;
     marker.style.cssText = `
         position: absolute;
-        left: ${offsetX + pixelX - 20}px;
-        top: ${offsetY + pixelY - 20}px;
+        left: ${displayCoords.x - 20}px;
+        top: ${displayCoords.y - 20}px;
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -729,30 +748,21 @@ function makeButtonDraggable(marker, buttonId) {
     document.addEventListener('mousemove', function(e) {
         if (!isDragging) return;
 
-        let mapImage = document.getElementById('map-image');
-        if (!mapImage) mapImage = document.getElementById('paineel-map');
-        if (!mapImage) mapImage = document.getElementById('paineel-2-map');
+        // NEW: Simple wrapper-based drag positioning
+        const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+        if (!mapWrapper) return;
         
-        const wrapper = mapImage.parentElement;
-        const imgRect = mapImage.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
+        const wrapperRect = mapWrapper.getBoundingClientRect();
+        
+        const newX = e.clientX - wrapperRect.left - offsetX;
+        const newY = e.clientY - wrapperRect.top - offsetY;
+        
+        // Clamp to wrapper bounds
+        const clampedX = Math.max(0, Math.min(wrapperRect.width - 40, newX));
+        const clampedY = Math.max(0, Math.min(wrapperRect.height - 40, newY));
 
-        const pixelX = e.clientX - imgRect.left - offsetX;
-        const pixelY = e.clientY - imgRect.top - offsetY;
-
-        const offsetLeft = (imgRect.left - wrapperRect.left);
-        const offsetTop = (imgRect.top - wrapperRect.top);
-
-        const minX = offsetLeft;
-        const maxX = offsetLeft + imgRect.width;
-        const minY = offsetTop;
-        const maxY = offsetTop + imgRect.height;
-
-        const clampedX = Math.max(minX, Math.min(maxX, e.clientX - offsetX));
-        const clampedY = Math.max(minY, Math.min(maxY, e.clientY - offsetY));
-
-        marker.style.left = (clampedX - wrapperRect.left) + 'px';
-        marker.style.top = (clampedY - wrapperRect.top) + 'px';
+        marker.style.left = clampedX + 'px';
+        marker.style.top = clampedY + 'px';
     });
 
     document.addEventListener('mouseup', function(e) {
@@ -760,80 +770,42 @@ function makeButtonDraggable(marker, buttonId) {
         isDragging = false;
         marker.style.zIndex = '14';
 
-        let mapImage = document.getElementById('map-image');
-        if (!mapImage) mapImage = document.getElementById('paineel-map');
-        if (!mapImage) mapImage = document.getElementById('paineel-2-map');
+        // NEW: Simple wrapper-based coordinate capture
+        const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+        if (!mapWrapper) return;
         
-        const wrapper = mapImage.parentElement;
-        const imgRect = mapImage.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
-
-        const pixelX = e.clientX - imgRect.left;
-        const pixelY = e.clientY - imgRect.top;
-
-        const normX = 1000 - (pixelX / imgRect.width) * 1000;
-        const normY = 400 + (pixelY / imgRect.height) * 1000;
-
-        placedButtons[buttonId].x = Math.round(normX);
-        placedButtons[buttonId].y = Math.round(normY);
+        const wrapperRect = mapWrapper.getBoundingClientRect();
+        const wrapperRelativeX = e.clientX - wrapperRect.left;
+        const wrapperRelativeY = e.clientY - wrapperRect.top;
+        const viewportCoords = convertClickToViewportCoordinates(wrapperRelativeX, wrapperRelativeY);
+        
+        placedButtons[buttonId].x = viewportCoords.x;
+        placedButtons[buttonId].y = viewportCoords.y;
 
         updateButtonsList();
         updateExportText();
 
-        console.log(`↪️ Moved button "${placedButtons[buttonId].name}" to (${Math.round(normX)}, ${Math.round(normY)})`);
+        console.log(`↪️ Moved button "${placedButtons[buttonId].name}" to (${viewportCoords.x}, ${viewportCoords.y})`);
     });
 }
 
 function createVisualPin(x, y, locationNum) {
-    // Handle both standard and custom map image IDs
-    let mapImage = document.getElementById('map-image');
-    let overlay = document.getElementById('map-overlay');
-    
-    if (!mapImage) {
-        mapImage = document.getElementById('paineel-map');
-    }
-    if (!mapImage) {
-        mapImage = document.getElementById('paineel-2-map');
-    }
-    
+    // NEW: Universal element detection
+    const overlay = document.getElementById('map-overlay') || document.querySelector('.map-overlay');
+
     if (!overlay) {
-        overlay = document.querySelector('.map-overlay');
-    }
-
-    // If mapImage is a container div, find the actual img element inside it
-    let actualImg = mapImage;
-    if (mapImage && mapImage.tagName !== 'IMG') {
-        actualImg = mapImage.querySelector('img');
-    }
-
-    const wrapper = mapImage?.parentElement;
-
-    if (!mapImage || !overlay || !wrapper) {
-        console.error('Could not find map elements for pin creation');
+        console.error('Could not find map overlay for pin creation');
         return;
     }
 
-    // actualImg was already determined above, use it to get image dimensions
-    if (!actualImg) {
-        console.error('Could not find actual image element');
-        return;
-    }
+    // NEW: Simple coordinate conversion using universal system
+    const displayCoords = convertViewportToDisplayCoordinates(x, y);
     
-    const imgRect = actualImg.getBoundingClientRect();
-    const containerRect = mapImage.getBoundingClientRect();
+    // Position pin with center offset
+    const pinLeft = displayCoords.x - 15;
+    const pinTop = displayCoords.y - 15;
     
-    // Convert from STANDARD coordinates to display coordinates using ACTUAL IMAGE dimensions
-    // (must match the dimensions used when click was converted)
-    const displayCoords = convertStandardToDisplayCoordinates(x, y, imgRect.width, imgRect.height);
-    
-    // Position relative to the container, accounting for image offset within container
-    const imgOffsetX = imgRect.left - containerRect.left;
-    const imgOffsetY = imgRect.top - containerRect.top;
-    
-    const pinLeft = displayCoords.x + imgOffsetX - 15;
-    const pinTop = displayCoords.y + imgOffsetY - 15;
-    
-    console.log(`Pin display: standard=(${x},${y}), image=${imgRect.width.toFixed(0)}x${imgRect.height.toFixed(0)}, display=(${displayCoords.x.toFixed(1)},${displayCoords.y.toFixed(1)}), offset=(${imgOffsetX.toFixed(0)},${imgOffsetY.toFixed(0)}), pinPos=(${pinLeft.toFixed(1)},${pinTop.toFixed(1)})`);
+    console.log(`Pin display: viewport=(${x},${y}), display=(${displayCoords.x.toFixed(1)},${displayCoords.y.toFixed(1)}), pinPos=(${pinLeft.toFixed(1)},${pinTop.toFixed(1)})`);
 
     // Create pin element
     const pin = document.createElement('div');

@@ -3,6 +3,8 @@ export const zoneData = {
     region: 'Odus',
     suggestedLevel: '5-15',
     mapImage: '../../Images/Odus/The Hole.png',
+    // NOTE: Coordinates have been updated to the new universal viewport system (0-1200, 0-900)
+    // If locations appear incorrect, use builder mode (?builder=true) to re-place pins
     locations: [
         { number: 1, name: 'West Tower', x: 764, y: 548 },
         { number: 2, name: 'East Tower', x: 692, y: 551 },

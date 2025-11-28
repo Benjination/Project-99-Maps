@@ -130,31 +130,16 @@ export const zoneData = {
 - Only include zones reachable without going through other zones
 - Position relative to where the adjacent zone would be geographically
 
-## Step 3: Extract Coordinates from Draw.io
+## Step 3: Add Location Coordinates
 
-1. Open your draw.io file with numbered location circles
-2. For each location circle, note:
-   - The circle's **value** attribute (the number displayed)
-   - The circle's **geometry** x,y coordinates
+Use the interactive builder mode to place pins:
 
-3. **Convert coordinates** using these formulas:
+1. Open the zone page with `?builder=true` query parameter (e.g., `zone.html?builder=true`)
+2. Click on the map where each location should be
+3. Enter the location number and description
+4. The coordinates are automatically stored in viewport space (0-1200, 0-900)
 
-```
-drawioWidth = 755    (895 - 140)
-drawioHeight = 800   (1150 - 350)
-drawioLeft = 140
-drawioTop = 350
-
-user_x = 1000 - ((drawio_x - drawioLeft) / drawioWidth) * 1000
-user_y = 400 + ((drawio_y - drawioTop) / drawioHeight) * 1000
-```
-
-**Example**: Circle at draw.io (380, 440)
-```
-user_x = 1000 - ((380 - 140) / 755) * 1000 = 1000 - 318 = 682
-user_y = 400 + ((440 - 350) / 800) * 1000 = 400 + 113 = 513
-→ Result: (682, 513)
-```
+**Important**: All coordinates are stored in a universal viewport system (0-1200, 0-900) that works with all maps regardless of size or aspect ratio. No manual coordinate conversion needed.
 
 ## Step 4: Add Location Reference File (Optional)
 
@@ -203,10 +188,11 @@ For adjacent zones, add buttons pointing to the new zone in their `data-{zonenam
 - Zone names in code: lowercase with hyphens
 
 ### Coordinate Accuracy
-1. Always verify coordinates against the draw.io file
-2. Test location markers on the actual page
-3. Check that markers appear at correct positions before committing
-4. Use browser console (F12) to verify coordinate conversion if needed
+1. Use builder mode to place pins by clicking
+2. Pins will appear exactly where you click in the viewport
+3. Test location markers on the actual page
+4. Check that markers appear at correct positions before committing
+5. Use browser console (F12) to verify if needed
 
 ### Button Placement
 1. Only add navigation buttons for directly adjacent zones
@@ -217,7 +203,7 @@ For adjacent zones, add buttons pointing to the new zone in their `data-{zonenam
 ### Location Details
 1. Include descriptions for guilds, banks, merchants, and special NPCs
 2. Note important items available (armor, weapons, reagents, etc.)
-3. Reference location numbers consistently with draw.io
+3. Keep location numbers consistent across references
 4. Keep descriptions concise (one sentence recommended)
 
 ## Testing Checklist
@@ -238,9 +224,9 @@ Before committing a new zone:
 ## Troubleshooting
 
 ### Markers appear in wrong locations
-- Check coordinate conversion formulas
-- Verify draw.io circle coordinates are correct
-- Ensure X-axis reversal is applied (1000 - calculated value)
+- Check that you're using the builder mode to place pins correctly
+- Verify coordinates are in viewport space (0-1200, 0-900)
+- Use browser console to check coordinate conversion logs
 
 ### Buttons disappear when clicking locations
 - This was fixed in `map-utils.js` to only remove location markers, not buttons
@@ -248,7 +234,7 @@ Before committing a new zone:
 
 ### Image not loading
 - Check relative paths in HTML and data files
-- Verify image file exists in `Images/Odus/`
+- Verify image file exists in `Images/Odus/` or `Images/Antonica/`
 - Ensure image ID matches the one in JavaScript
 
 ### Navigation links broken

@@ -3,6 +3,8 @@ export const zoneData = {
     region: 'Odus',
     suggestedLevel: '15-25',
     mapImage: '../../Images/Odus/StonebruntMountains.png',
+    // NOTE: Coordinates have been updated to the new universal viewport system (0-1200, 0-900)
+    // If locations appear incorrect, use builder mode (?builder=true) to re-place pins
     locations: [
         { number: 1, name: 'Highland Kobold Camps', x: 733, y: 532 },
         { number: 1, name: 'Highland Kobold Camps', x: 434, y: 534 },

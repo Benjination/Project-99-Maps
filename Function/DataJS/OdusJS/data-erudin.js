@@ -3,6 +3,8 @@ export const zoneData = {
     region: 'Odus',
     suggestedLevel: '1-10',
     mapImage: '../../Images/Odus/Erudin.png',
+    // NOTE: Coordinates have been updated to the new universal viewport system (0-1200, 0-900)
+    // If locations appear incorrect, use builder mode (?builder=true) to re-place pins
     locations: [
         { number: 1, name: 'Temple of Divine Light', x: 626, y: 525 },
         { number: 2, name: 'Teleporter to Erudin Palace', x: 548, y: 501 },

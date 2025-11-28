@@ -1,36 +1,58 @@
 /**
+ * UNIVERSAL MAP UTILITIES
+ * 
+ * ⚠️  IMPORTANT: This file uses the cleaned universal coordinate system.
+ * ⚠️  DO NOT REVERT to old draw.io coordinate calculations
+ * ⚠️  DO NOT use image-specific offset calculations
+ * 
+ * CURRENT SYSTEM (November 2025):
+ * - Universal coordinate space: (0-1200, 0-900)
+ * - Locked to .map-image-wrapper dimensions, NOT individual image sizes  
+ * - Works with ANY image size (200+ different maps)
+ * - Element detection: document.querySelector('.map-image-wrapper') or '.map-overlay'
+ *
  * Shared map utilities for all zone pages
  */
 
-// ===== STANDARD COORDINATE SYSTEM =====
-// All maps use a STANDARD reference size for coordinate storage
-// This allows 200+ maps of different sizes to use the same coordinate system
-// The standard container is the reference - images scale to fit, but coordinates stay consistent
+// ===== UNIVERSAL COORDINATE SYSTEM =====
+// ONE system that works with ALL maps, regardless of size or continent
 // 
-// CRITICAL: Container size MUST be identical in builder and non-builder modes!
-// - CSS enforces 4:3 aspect ratio on .map-image to maintain consistency
-// - The actual pixel dimensions may vary based on viewport, but the aspect ratio stays constant
-// - Both builder and non-builder measure the container at runtime to ensure they convert identically
-const STANDARD_CONTAINER_WIDTH = 1200;
-const STANDARD_CONTAINER_HEIGHT = 900;
+// The viewing window is ALWAYS a fixed size (1200×900 reference)
+// All maps are scaled/fitted into this window using CSS (object-fit: contain)
+// Store all coordinates in this fixed viewport space (0-1200, 0-900)
+const VIEWPORT_WIDTH = 1200;   // Fixed reference width (what we store)
+const VIEWPORT_HEIGHT = 900;   // Fixed reference height (what we store)
 
-// Conversion helpers to convert between actual container size and standard size
-function getActualContainerSize() {
-    const mapImage = document.getElementById('map-image') || document.getElementById('paineel-map') || document.getElementById('paineel-2-map');
-    if (!mapImage) {
-        console.warn('map image not found, using standard size as fallback');
-        return { width: STANDARD_CONTAINER_WIDTH, height: STANDARD_CONTAINER_HEIGHT };
-    }
-    const rect = mapImage.getBoundingClientRect();
-    console.log(`📏 Container size: ${rect.width.toFixed(0)}x${rect.height.toFixed(0)} (aspect: ${(rect.width/rect.height).toFixed(3)})`);
-    return { width: rect.width, height: rect.height };
+// Conversion helpers - works with FIXED viewport size
+function getViewportSize() {
+    // The viewport is always 1200×900 in our coordinate system
+    return { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT };
 }
 
-function convertStandardToDisplayCoordinates(standardX, standardY, actualContainerWidth, actualContainerHeight) {
-    // Convert from STANDARD coordinates back to actual container pixel coordinates
-    const displayX = (standardX / STANDARD_CONTAINER_WIDTH) * actualContainerWidth;
-    const displayY = (standardY / STANDARD_CONTAINER_HEIGHT) * actualContainerHeight;
-    return { x: displayX, y: displayY };
+function convertViewportToDisplayCoordinates(viewportX, viewportY) {
+    // Simple approach: Convert from our fixed coordinate space to actual viewer pixels
+    
+    // Find the viewer wrapper to get its actual dimensions
+    const mapWrapper = document.querySelector('.map-image-wrapper') || document.querySelector('.map-viewer');
+    
+    if (!mapWrapper) {
+        console.warn('Could not find map wrapper for display conversion');
+        return { x: viewportX, y: viewportY };
+    }
+    
+    const wrapperRect = mapWrapper.getBoundingClientRect();
+    
+    // Scale from our fixed 1200×900 coordinate space to actual wrapper size
+    const scaleX = wrapperRect.width / VIEWPORT_WIDTH;
+    const scaleY = wrapperRect.height / VIEWPORT_HEIGHT;
+    
+    const displayX = viewportX * scaleX;
+    const displayY = viewportY * scaleY;
+    
+    return { 
+        x: displayX, 
+        y: displayY 
+    };
 }
 
 /**
@@ -94,33 +116,21 @@ export function renderMapButtons(buttons) {
     buttons.forEach(button => {
         // Get the actual displayed dimensions of the image
         const imgRect = mapImage.getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
+        const viewportRect = mapImage.parentElement.getBoundingClientRect();
         
-        // Image natural dimensions in draw.io coordinates
-        const drawioWidth = 755;
-        const drawioHeight = 800;
-        const drawioLeft = 140;
-        const drawioTop = 350;
+        // Convert viewport coordinates to display pixels
+        const displayCoords = convertViewportToDisplayCoordinates(button.x, button.y);
         
-        // Convert desired coordinates to draw.io coordinates
-        const drawio_x = drawioLeft + ((1000 - button.x) / 1000) * drawioWidth;
-        const drawio_y = drawioTop + ((button.y - 400) / 1000) * drawioHeight;
-        
-        // Convert draw.io coordinates to pixel positions on the displayed image
-        const pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
-        const pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
-        
-        // Calculate offset of image within wrapper
-        const offsetX = (imgRect.left - wrapperRect.left);
-        const offsetY = (imgRect.top - wrapperRect.top);
-        
+        const imgOffsetX = imgRect.left - viewportRect.left;
+        const imgOffsetY = imgRect.top - viewportRect.top;
+
         // Create a button element
         const buttonEl = document.createElement('button');
         buttonEl.className = 'map-button';
         buttonEl.textContent = button.name;
         buttonEl.style.position = 'absolute';
-        buttonEl.style.left = (offsetX + pixelX - 50) + 'px';
-        buttonEl.style.top = (offsetY + pixelY - 15) + 'px';
+        buttonEl.style.left = (imgOffsetX + displayCoords.x - 50) + 'px';
+        buttonEl.style.top = (imgOffsetY + displayCoords.y - 15) + 'px';
         buttonEl.style.width = '100px';
         buttonEl.style.height = '30px';
         buttonEl.style.padding = '5px';
@@ -164,40 +174,20 @@ export function highlightLocation(location) {
     
     // Get the actual displayed dimensions of the image
     const imgRect = mapImage.getBoundingClientRect();
-    const wrapperRect = wrapper.getBoundingClientRect();
+    const viewportRect = mapImage.parentElement.getBoundingClientRect();
     
-    // Image natural dimensions in draw.io coordinates
-    const drawioWidth = 755; // 895 - 140
-    const drawioHeight = 800; // 1150 - 350
-    const drawioLeft = 140;
-    const drawioTop = 350;
+    // Convert viewport coordinates to display pixels
+    const displayCoords = convertViewportToDisplayCoordinates(location.x, location.y);
     
-    // Coordinate system (FLIPPED):
-    // Top-left: (1000, 1400), Top-right: (0, 1400)
-    // Bottom-left: (1000, 400), Bottom-right: (0, 0)
-    // X: 1000 (left) to 0 (right) - REVERSED
-    // Y: 1400 (top) to 0 (bottom) - but our data uses 400-1400
-    
-    // Convert desired coordinates to draw.io coordinates
-    // X is reversed: location.x goes 1000->0, but draw.io goes 140->895
-    const drawio_x = drawioLeft + ((1000 - location.x) / 1000) * drawioWidth;
-    // Y: location.y goes 400->1400, draw.io goes 350->1150
-    const drawio_y = drawioTop + ((location.y - 400) / 1000) * drawioHeight;
-    
-    // Convert draw.io coordinates to pixel positions on the displayed image
-    const pixelX = (drawio_x - drawioLeft) * (imgRect.width / drawioWidth);
-    const pixelY = (drawio_y - drawioTop) * (imgRect.height / drawioHeight);
-    
-    // Calculate offset of image within wrapper
-    const offsetX = (imgRect.left - wrapperRect.left);
-    const offsetY = (imgRect.top - wrapperRect.top);
-    
+    const imgOffsetX = imgRect.left - viewportRect.left;
+    const imgOffsetY = imgRect.top - viewportRect.top;
+
     // Create a circle marker at the location
     const marker = document.createElement('div');
     marker.className = 'location-marker';
     marker.style.position = 'absolute';
-    marker.style.left = (offsetX + pixelX - 15) + 'px';
-    marker.style.top = (offsetY + pixelY - 15) + 'px';
+    marker.style.left = (imgOffsetX + displayCoords.x - 15) + 'px';
+    marker.style.top = (imgOffsetY + displayCoords.y - 15) + 'px';
     marker.style.width = '30px';
     marker.style.height = '30px';
     marker.style.borderRadius = '50%';
@@ -215,7 +205,7 @@ export function highlightLocation(location) {
     overlay.appendChild(marker);
     
     // Debug info
-    console.log(`Location ${location.number}: desired (${location.x}, ${location.y}) → drawio (${drawio_x.toFixed(1)}, ${drawio_y.toFixed(1)}) → pixels (${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
+    console.log(`Location ${location.number}: viewport (${location.x}, ${location.y}) → display (${displayCoords.x.toFixed(1)}, ${displayCoords.y.toFixed(1)})`);
 }
 
 /**
@@ -224,25 +214,12 @@ export function highlightLocation(location) {
  * @param {Array} locations - All locations array
  */
 export function highlightLocationInstances(locationNumber, locations) {
-    const mapImage = document.getElementById('map-image') || document.getElementById('paineel-map') || document.getElementById('paineel-2-map');
-    const overlay = document.getElementById('map-overlay');
-    const wrapper = mapImage?.parentElement;
+    const overlay = document.getElementById('map-overlay') || document.querySelector('.map-overlay');
     
-    if (!mapImage || !overlay || !wrapper) return;
-    
-    // Get the actual image element (centered within the map-image container)
-    const actualImg = mapImage.querySelector('img') || document.querySelector('#zone-map');
-    if (!actualImg) {
-        console.error('Could not find actual image element');
+    if (!overlay) {
+        console.error('Could not find map overlay');
         return;
     }
-    
-    const imgRect = actualImg.getBoundingClientRect();
-    const containerRect = mapImage.getBoundingClientRect();
-    
-    // Image offset within container (due to flex centering)
-    const imgOffsetX = imgRect.left - containerRect.left;
-    const imgOffsetY = imgRect.top - containerRect.top;
     
     // Remove all previous location markers (keep buttons)
     const previousMarkers = overlay.querySelectorAll('.location-marker');
@@ -252,14 +229,14 @@ export function highlightLocationInstances(locationNumber, locations) {
     const instances = locations.filter(loc => loc.number === locationNumber);
     
     instances.forEach(location => {
-        // Assume all NEW locations use STANDARD coordinates
-        // (Old draw.io system support can be added back if needed)
-        const displayCoords = convertStandardToDisplayCoordinates(location.x, location.y, imgRect.width, imgRect.height);
+        // All locations use VIEWPORT coordinates (0-1200, 0-900)
+        // convertViewportToDisplayCoordinates returns wrapper-relative coordinates
+        const displayCoords = convertViewportToDisplayCoordinates(location.x, location.y);
         
-        const pixelX = displayCoords.x + imgOffsetX;
-        const pixelY = displayCoords.y + imgOffsetY;
+        const pixelX = displayCoords.x;
+        const pixelY = displayCoords.y;
         
-        console.log(`Location ${location.number}: standard=(${location.x}, ${location.y}) → display=(${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
+        console.log(`Location ${location.number}: viewport=(${location.x}, ${location.y}) → display=(${pixelX.toFixed(1)}, ${pixelY.toFixed(1)})`);
         
         // Create a circle marker at each instance
         const marker = document.createElement('div');

@@ -1,7 +1,3 @@
-# Draw.io and design files
-*.drawio
-*.drawio.bkp
-
 # OS files
 .DS_Store
 .DS_Store?
