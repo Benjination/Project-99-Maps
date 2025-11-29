@@ -1,0 +1,27 @@
+1. Shops selling Cloth Armor, Cooking Supplies, Clay and Firing Sheets
+2. Shops selling Throwing Daggers and Tailoring Patterns. Innkeep Rislarn selling Food
+3. Bandit Camp (Bandits: Level 9-11). Note there is also a bandit camp ("3 North") just north and slightly east of Camp 3, near (890, -7050)
+4. Guard Tower ("Tower 1")
+5. Guard Tower ("Tower 2")
+6. Farm taken over by Bandits and a Brigand (Bandits: Level 9-11)
+7. Cleet Miller Farm
+8. Empty farm
+9. Corrupt Guard Tower
+10. Fields with Scarecrows (Undead Level 12-17)
+11. Henina Miller Farm with Furball, also sells items
+12. Empty farm
+13. Barbarian Village selling Large Blacksmithing Molds and Books, Shaman Summon Spells
+14. Tiny Miller's House
+15. Farm with ex-Druid, Linaya Sowlin
+16. Mountains filled with Bandits (Bandits: Level 9-11; the map makes it look more to the West than it is; loc is closer to 900, -11500)
+17. Caninel with Gnoll Allies
+18. Ogre Shrine guarded by Ogre Guards, Ogre shamans (ph's for, An Ogre Priestess & Chief Goonda) (Ogres: Level 20-27 | Chief Level 34) respawns 22 minutes
+19. Froon and Choon on a hill
+20. Barbarian shop selling Fletching Kit, Arrows, Bows, and Nocks,
+21. Shops selling Blacksmithing Books and Molds, also Innkeep Danin selling Food
+22. Farms
+23. Farms
+24. Bandit Camp
+25. Farms with Poison Merchant
+26. Pyramid (Wizard portal)
+27. Undead Ruins

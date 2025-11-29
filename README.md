@@ -22,41 +22,70 @@ An interactive web-based mapping system for Project 1999 EverQuest zones. Browse
   - The Warrens
   - Toxulia Forest
 
+- **Antonica Region**
+  - Qeynos (North & South)
+  - Qeynos Hills & Aqueducts
+  - Surefall Glade & Bear Caves
+  - Blackburrow (3 levels)
+  - Everfrost Peaks & Halas
+  - Permafrost Keep
+  - Karana Plains (Western, Northern, Eastern, Southern)
+  - High Hold Pass & High Keep (5 levels)
+  - Kithicor Forest
+  - Misty Thicket & Rivervale
+  - Gorge of King Xorbb
+  - Runnyeye Citadel (4 levels)
+
 ## Project Structure
 
 ```
 .
 ├── index.html                 # Homepage with zone selection
-├── Fashion/HTML/              # Zone page templates
+├── Fashion/HTML/              # Odus zone page templates
 │   ├── paineel.html
 │   ├── paineel-2.html
 │   ├── the-hole.html
 │   ├── the-warrens.html
 │   └── toxulia-forest.html
+├── Fashion/AntonicaHTML/      # Antonica zone page templates
+│   ├── qeynos-n.html
+│   ├── qeynos-s.html
+│   ├── western-karana.html
+│   ├── runnyeye1.html
+│   └── ...
 ├── Function/
 │   ├── zone-init.js          # Zone page initialization
 │   ├── map-utils.js          # Shared mapping utilities
-│   ├── Data/                 # Zone data files
-│   │   ├── data-paineel.js
-│   │   ├── data-paineel-2.js
-│   │   ├── data-the-hole.js
-│   │   ├── data-the-warrens.js
-│   │   └── data-toxulia-forest.js
-│   └── CSS/                  # Stylesheets
+│   ├── builder-mode.js       # Interactive pin placement
+│   ├── DataJS/              # Zone data files
+│   │   ├── OdusJS/          # Odus zone data
+│   │   │   ├── data-paineel.js
+│   │   │   ├── data-the-hole.js
+│   │   │   └── ...
+│   │   └── AntonicaJS/      # Antonica zone data
+│   │       ├── data-qeynos-n.js
+│   │       ├── data-western-karana.js
+│   │       └── ...
+│   └── CSS/                 # Stylesheets
 │       ├── maps.css
-│       ├── paineel.css
+│       ├── paineel.css      # Universal zone styling
 │       └── zone.css
-├── Images/Odus/              # Zone map images
-│   ├── Paineel.png
-│   ├── Paineel2.png
-│   ├── TheHole.png
-│   ├── TheWarrens.png
-│   └── ToxuliaForest.png
-└── Locations/                # Location reference files
-    ├── paineel.txt
+├── Images/
+│   ├── Odus/               # Odus zone map images
+│   │   ├── Paineel.png
+│   │   ├── TheHole.png
+│   │   └── ...
+│   └── Antonica/           # Antonica zone map images
+│       ├── QeynosN.png
+│       ├── WesternKarana.png
+│       └── ...
+└── Locations/              # Location reference files
+    ├── paineel.txt         # Odus locations
     ├── theHole.txt
-    ├── theWarrens.txt
-    └── toxuliaForest.txt
+    └── AntonicaLoc/        # Antonica locations
+        ├── qeynosN.txt
+        ├── westernKarana.txt
+        └── ...
 ```
 
 ## Usage
@@ -94,11 +123,12 @@ Please feel free to submit a pull request.
 
 To add a new zone:
 
-1. Create a new HTML file in `Fashion/HTML/`
-2. Create a corresponding data file in `Function/Data/data-zonename.js`
-3. Add zone image to `Images/Odus/`
-4. Update navigation links in existing zone pages
-5. Update the main `index.html` if adding a new region
+1. Create a new HTML file in `Fashion/AntonicaHTML/` or `Fashion/HTML/`
+2. Create a corresponding data file in `Function/DataJS/AntonicaJS/` or `Function/DataJS/OdusJS/` using `export const zoneData` format
+3. Add zone image to `Images/Antonica/` or `Images/Odus/`
+4. Use builder mode (`?builder=true`) to position location pins
+5. Update navigation buttons in adjacent zone data files
+6. Update the main `index.html` navigation menu
 
 ## Project 1999
 

@@ -1,0 +1,42 @@
+export const zoneData = {
+    name: 'Western Karana',
+    region: 'Antonica',
+    description: 'Western Karana - Plains of Karana',
+    suggestedLevel: '8-35',
+    mapImage: '../../Images/Antonica/WesternKarana.png',
+    // NOTE: Coordinates use universal viewport system (0-1200, 0-900)
+    // Use builder mode (?builder=true) to position pins accurately
+     locations: [
+        { number: 1, name: 'Cloth Armor Shop', x: 134, y: 303 },
+        { number: 2, name: 'Throwing Daggers Shop', x: 296, y: 316 },
+        { number: 3, name: 'Bandit Camp', x: 450, y: 320 },
+        { number: 4, name: 'Guard Tower 1', x: 170, y: 374 },
+        { number: 5, name: 'Guard Tower 2', x: 287, y: 401 },
+        { number: 6, name: 'Bandit Farm', x: 401, y: 386 },
+        { number: 7, name: 'Cleet Miller Farm', x: 294, y: 478 },
+        { number: 8, name: 'Empty Farm', x: 386, y: 495 },
+        { number: 9, name: 'Corrupt Guard Tower', x: 144, y: 526 },
+        { number: 10, name: 'Scarecrow Fields', x: 310, y: 547 },
+        { number: 11, name: 'Henina Miller Farm', x: 404, y: 531 },
+        { number: 12, name: 'Empty Farm', x: 477, y: 533 },
+        { number: 13, name: 'Barbarian Village', x: 144, y: 593 },
+        { number: 14, name: 'Tiny Miller House', x: 387, y: 596 },
+        { number: 15, name: 'Linaya Sowlin Farm', x: 549, y: 606 },
+        { number: 16, name: 'Bandit Mountains', x: 630, y: 333 },
+        { number: 17, name: 'Caninel', x: 950, y: 285 },
+        { number: 18, name: 'Ogre Shrine', x: 664, y: 383 },
+        { number: 19, name: 'Froon and Choon', x: 630, y: 432 },
+        { number: 20, name: 'Barbarian Fletcher', x: 631, y: 469 },
+        { number: 21, name: 'Blacksmith Shop', x: 936, y: 451 },
+        { number: 22, name: 'Farms', x: 1026, y: 472 },
+        { number: 23, name: 'Farms', x: 639, y: 579 },
+        { number: 24, name: 'Bandit Camp', x: 787, y: 566 },
+        { number: 25, name: 'Poison Merchant Farm', x: 946, y: 574 },
+        { number: 26, name: 'Pyramid', x: 1047, y: 573 },
+        { number: 27, name: 'Undead Ruins', x: 1086, y: 573 },
+    ],
+    buttons: [
+        { name: 'Northern Karana', link: 'northern-karana.html', x: 1134, y: 315 },
+        { name: 'Qeynos Hills', link: 'qeynos-hills.html', x: 44, y: 357 },
+    ]
+};

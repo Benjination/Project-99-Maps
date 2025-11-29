@@ -7,10 +7,14 @@ This guide documents the process and standards used to create zone pages for Pro
 Every zone requires these files:
 
 ```
-Fashion/HTML/{zonename}.html          # Zone page template
-Function/Data/data-{zonename}.js      # Zone configuration and locations
-Images/Odus/{ZoneName}.png            # Map image
-Locations/{zonename}.txt              # Location reference (optional)
+Fashion/AntonicaHTML/{zonename}.html          # Zone page (Antonica zones)
+Fashion/HTML/{zonename}.html                  # Zone page (Odus zones)  
+Function/DataJS/AntonicaJS/data-{zonename}.js # Zone data (Antonica)
+Function/DataJS/OdusJS/data-{zonename}.js     # Zone data (Odus)
+Images/Antonica/{ZoneName}.png                # Map image (Antonica)
+Images/Odus/{ZoneName}.png                    # Map image (Odus)
+Locations/AntonicaLoc/{zonename}.txt          # Location reference (Antonica)
+Locations/{zonename}.txt                      # Location reference (Odus)
 ```
 
 ## Step 1: Create the HTML Page
@@ -26,22 +30,21 @@ Locations/{zonename}.txt              # Location reference (optional)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{Zone Name} - Project 1999 Maps</title>
     <link rel="stylesheet" href="../../Function/CSS/maps.css">
-    <link rel="stylesheet" href="../../Function/CSS/zone.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <a href="../../index.html" class="back-link">← Back to Zones</a>
-            <h1>{Zone Name}</h1>
-            <p class="subtitle">{Zone Description}</p>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">{Region} - {Zone Name}</p>
         </header>
 
         <nav class="location-nav">
-            <a href="../../index.html">Home</a>
-            <span class="separator">/</span>
-            <a href="../../index.html">{Region}</a>
-            <span class="separator">/</span>
-            <span class="current">{Zone Name}</span>
+            <a href="../HTML/index.html" class="nav-link">Home</a>
+            <span class="nav-separator">/</span>
+            <a href="../HTML/index.html" class="nav-link">{Region}</a>
+            <span class="nav-separator">/</span>
+            <span class="nav-current">{Zone Name}</span>
         </nav>
 
         <nav class="adjacent-zones">
@@ -49,21 +52,22 @@ Locations/{zonename}.txt              # Location reference (optional)
             <!-- <a href="{adjacent-zone}.html" class="adjacent-button">→ {Adjacent Zone}</a> -->
         </nav>
 
-        <main id="map-container">
-            <section class="map-viewer">
+        <div class="map-container">
+            <div class="map-viewer">
                 <div class="map-image-wrapper">
-                    <img id="{zonename}-map" src="../../Images/Odus/{ZoneName}.png" alt="{Zone Name} Map" class="map-image">
+                    <img id="zone-map" src="../../Images/{Region}/{ZoneName}.png" alt="{Zone Name} Map" class="map-image">
                     <div id="map-overlay" class="map-overlay"></div>
                 </div>
                 <div class="map-info">
                     <h2>Locations</h2>
                     <div id="locations-list" class="locations-list"></div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="../../Function/zone-init.js"></script>
+    <script src="../../Function/page-check.js"></script>
 </body>
 </html>
 ```
@@ -75,20 +79,23 @@ Locations/{zonename}.txt              # Location reference (optional)
 
 ## Step 2: Create the Zone Data File
 
-**Location**: `Function/Data/data-{zonename}.js`
+**Location**: `Function/DataJS/AntonicaJS/data-{zonename}.js` (or `Function/DataJS/OdusJS/` for Odus zones)
 
 **Template**:
 ```javascript
 export const zoneData = {
     name: '{Zone Name}',
-    region: '{Region Name}',
+    region: '{Region Name}', 
+    description: '{Zone Description} - {Brief Details}',
     suggestedLevel: '{Level Range}',
-    mapImage: '../../Images/Odus/{ZoneName}.png',
+    mapImage: '../../Images/{Region}/{ZoneName}.png',
+    // NOTE: Coordinates use universal viewport system (0-1200, 0-900)
+    // Use builder mode (?builder=true) to position pins accurately
     locations: [
         // Location objects (see below for format)
     ],
     buttons: [
-        // Navigation buttons (see below for format)
+        // Navigation buttons (see below for format)  
     ]
 };
 ```
@@ -100,19 +107,17 @@ export const zoneData = {
     number: 1,                          // Location number (1-indexed)
     name: 'Location Name',              // Full name
     description: 'Optional details',    // Optional: guild info, merchants, etc.
-    x: 500,                             // X coordinate (0-1000, left to right)
-    y: 700                              // Y coordinate (400-1400, bottom to top)
+    x: 600,                             // X coordinate (0-1200, universal viewport)
+    y: 450                              // Y coordinate (0-900, universal viewport)
 }
 ```
 
 **Coordinate System**:
-- **X-axis**: 1000 (left) → 0 (right) — REVERSED
-- **Y-axis**: 400 (bottom) → 1400 (top)
-- **Corners**:
-  - Top-left: (1000, 1400)
-  - Top-right: (0, 1400)
-  - Bottom-left: (1000, 400)
-  - Bottom-right: (0, 400)
+- **Universal Viewport**: All zones use 1200×900 coordinate space
+- **X-axis**: 0 (left) → 1200 (right)
+- **Y-axis**: 0 (top) → 900 (bottom)
+- **Builder Mode**: Use `?builder=true` to position pins by clicking
+- **No Manual Conversion**: System automatically handles different image sizes
 
 ### Navigation Button Format
 
