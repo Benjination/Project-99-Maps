@@ -3,7 +3,7 @@ export const zoneData = {
     region: 'Antonica',
     description: 'Qeynos Aquaducts',
     suggestedLevel: '1-10',
-    mapImage: '../../Images/Antonica/qeynosAquaducts.png',
+    mapImage: '../../Images/Antonica/QeynosAquaducts.png',
     // NOTE: Coordinates may need adjustment for universal viewport system (0-1200, 0-900)
     // If locations appear incorrect, use builder mode (?builder=true) to re-place pins
     locations: [

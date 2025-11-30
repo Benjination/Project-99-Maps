@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Befallen Level 1 - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">Antonica - Befallen Level 1</p>
+        </header>
+
+        <nav class="location-nav">
+            <a href="../../index.html" class="nav-link">Home</a>
+            <span class="nav-separator">/</span>
+            <a href="../../index.html" class="nav-link">Antonica</a>
+            <span class="nav-separator">/</span>
+            <a href="west-commonlands.html" class="nav-link">West Commonlands</a>
+            <span class="nav-separator">/</span>
+            <span class="nav-current">Befallen Level 1</span>
+        </nav>
+
+        <nav class="level-nav">
+            <span class="level-current">Level 1</span>
+            <a href="befallen2.html" class="level-link">Level 2</a>
+        </nav>
+
+        <nav class="adjacent-zones">
+            <a href="west-commonlands.html" class="adjacent-button">← West Commonlands</a>
+            <a href="befallen2.html" class="adjacent-button">Level 2 ↓</a>
+        </nav>
+
+        <div class="map-container">
+            <div class="map-viewer">
+                <div class="map-image-wrapper">
+                    <img id="zone-map" src="../../Images/Antonica/Befallen1.png" alt="Befallen Level 1 Map" class="map-image">
+                    <div id="map-overlay" class="map-overlay"></div>
+                </div>
+                <div class="map-info">
+                    <h2>Locations</h2>
+                    <div id="locations-list" class="locations-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../../Function/zone-init.js"></script>
+    <script src="../../Function/page-check.js"></script>
+</body>
+</html>

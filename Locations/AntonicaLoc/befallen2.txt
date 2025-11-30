@@ -1,0 +1,7 @@
+C. Locked door, requires smoked glass key
+1. Pit from area 2 on level 1
+2. Spawn area of The Thaumaturgist who drops Dagger of Marnek (Common), Gossamer Robe (Uncommon) and Thaumaturgist's Robe (Rare) and Damask Robe (Rare), and Priest Amiaz who drops Blackened Wand (Rare)
+3. Spawn area of a shadowknight (Troll) who drops Bone Bladed Claymore (Rare), Smoked Glass Key (Always), Splintered Wooden Key (Always?), Charred Bone Key (Always?)
+4. Bottom of pit trap in area 3 on level 2
+5. Spawn area of An Elf Skeleton who drops Thex Mallet Piece
+6. Spawn area of Dark Elf Female Shadow Knight who drops Barbed Legplates (Rare); can drop any of the keys of Befallen including Splintered Wooden Key, Charred Bone Key, and Smoked Glass Key.

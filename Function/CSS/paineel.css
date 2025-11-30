@@ -72,6 +72,7 @@
     grid-template-columns: 1fr 300px;
     gap: 20px;
     height: calc(100vh - 300px);
+    min-height: 600px;
 }
 
 .map-image-wrapper {
@@ -83,15 +84,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Maintain EXACT 4:3 aspect ratio (1200:900) always */
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .map-image {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    display: block;
 }
 
 .map-overlay {
@@ -181,10 +186,19 @@
     background: #555;
 }
 
-/* Responsive design */
+/* Responsive design - maintain exact aspect ratio on all screens */
 @media (max-width: 1024px) {
     .map-viewer {
         grid-template-columns: 1fr;
+        height: auto;
+        gap: 15px;
+    }
+
+    .map-image-wrapper {
+        /* Keep exact 4:3 aspect ratio, just scale smaller */
+        aspect-ratio: 4 / 3;
+        width: 100%;
+        height: auto;
     }
 
     .map-info {
@@ -194,7 +208,10 @@
 
 @media (max-width: 768px) {
     .map-image-wrapper {
-        max-height: 400px;
+        /* Still maintain exact 4:3 ratio, even smaller */
+        aspect-ratio: 4 / 3;
+        width: 100%;
+        height: auto;
     }
 
     .map-info {
@@ -203,5 +220,49 @@
 
     .location-nav {
         flex-wrap: wrap;
+    }
+
+    .adjacent-zones {
+        justify-content: center;
+    }
+}
+
+/* Vertical/Portrait screens - keep same aspect ratio */
+@media (orientation: portrait) {
+    .map-viewer {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 15px;
+    }
+
+    .map-image-wrapper {
+        /* Exact 4:3 ratio maintained on vertical screens */
+        aspect-ratio: 4 / 3;
+        width: 100%;
+        height: auto;
+    }
+
+    .map-info {
+        max-height: 35vh;
+    }
+}
+
+/* Very tall screens (vertical monitors) - scale up while keeping ratio */
+@media (min-height: 1200px) {
+    .map-viewer {
+        height: auto;
+        max-height: 85vh;
+    }
+
+    .map-image-wrapper {
+        /* Scale larger but keep exact 4:3 ratio */
+        aspect-ratio: 4 / 3;
+        width: 100%;
+        height: auto;
+        max-height: 70vh;
+    }
+
+    .map-info {
+        max-height: 70vh;
     }
 }

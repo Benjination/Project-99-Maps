@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>West Freeport - Project 1999 Maps</title>
+    <link rel="stylesheet" href="../../Function/CSS/maps.css">
+    <link rel="stylesheet" href="../../Function/CSS/paineel.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project 1999 Maps</h1>
+            <p class="subtitle">Antonica - West Freeport</p>
+        </header>
+
+        <nav class="location-nav">
+            <a href="../../index.html" class="nav-link">Home</a>
+            <span class="nav-separator">/</span>
+            <a href="../../index.html" class="nav-link">Antonica</a>
+            <span class="nav-separator">/</span>
+            <span class="nav-current">West Freeport</span>
+        </nav>
+
+        <nav class="adjacent-zones">
+            <a href="north-freeport.html" class="adjacent-button">→ North Freeport</a>
+            <a href="east-freeport.html" class="adjacent-button">→ East Freeport</a>
+            <a href="west-freepoint-tunnel.html" class="adjacent-button">Tunnel ↓</a>
+        </nav>
+
+        <div class="map-container">
+            <div class="map-viewer">
+                <div class="map-image-wrapper">
+                    <img id="zone-map" src="../../Images/Antonica/WestFreeport.png" alt="West Freeport Map" class="map-image">
+                    <div id="map-overlay" class="map-overlay"></div>
+                </div>
+                <div class="map-info">
+                    <h2>Locations</h2>
+                    <div id="locations-list" class="locations-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../../Function/zone-init.js"></script>
+    <script src="../../Function/page-check.js"></script>
+</body>
+</html>
